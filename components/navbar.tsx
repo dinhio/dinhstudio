@@ -86,21 +86,11 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         </div>
       </div>
 
-      {/* ─── Desktop: always-visible "Get in touch" ─── */}
-      <div className="fixed top-6 right-6 z-50 hidden md:block">
-        <Link
-          href="/contact"
-          className="flex h-10 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
-        >
-          Get in touch
-        </Link>
-      </div>
-
-      {/* ─── Main navbar — slides down after scrolling past hero ─── */}
+      {/* ─── Main navbar — always in DOM; slides down after scrolling past hero ─── */}
       <nav
         id="main-nav"
         aria-hidden={!navVisible}
-        className="fixed top-0 left-0 right-0 z-40 transition-transform duration-500 ease-in-out"
+        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-in-out"
         style={{
           transform: navVisible ? "translateY(0)" : "translateY(-100%)",
         }}
@@ -140,8 +130,15 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
             ))}
           </div>
 
-          {/* Spacer to visually balance the fixed "Get in touch" button */}
-          <div className="hidden w-[120px] md:block" />
+          {/* "Get in touch" — always visible, inside the navbar row */}
+          <div className="hidden md:block">
+            <Link
+              href="/contact"
+              className="flex h-9 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
+            >
+              Get in touch
+            </Link>
+          </div>
 
           {/* Mobile hamburger inside the scrolled nav bar */}
           <button
