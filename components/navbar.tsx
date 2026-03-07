@@ -50,13 +50,15 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         Desktop shows centre links; mobile hides them behind hamburger.
       */}
       <header className="fixed top-0 left-0 right-0 z-50">
-        {/* Fading background layer — separate so content opacity is unaffected */}
+        {/* Fading background layer — separate div so text/button opacity is never affected */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
+          className="pointer-events-none absolute inset-0 md:backdrop-blur-md"
           style={{
             backgroundColor: "var(--background)",
-            opacity: bgOpacity * 0.92,
+            opacity: bgOpacity,
+            transition: "opacity 200ms linear",
+            willChange: "opacity",
           }}
         />
 
@@ -106,12 +108,13 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
       </header>
 
       {/* ── Mobile full-screen overlay menu ──────────────────────────────── */}
+      {/* z-[45] — above page content but below the z-50 header so logo/button stay on top */}
       <div
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
+        className="fixed inset-0 z-[45] flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? "auto" : "none",
