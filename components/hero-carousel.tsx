@@ -170,40 +170,38 @@ export function HeroCarousel() {
     analyzeColors();
   }, []);
 
-  const getItemStyle = (index: number) => {
-    const diff = index - activeIndex;
-    const normalizedDiff =
-      ((diff + carouselItems.length + Math.floor(carouselItems.length / 2)) %
-        carouselItems.length) -
-      Math.floor(carouselItems.length / 2);
+  // Only compute slots for prev, active, next — nothing else is rendered
+  const getSlots = () => {
+    const total = carouselItems.length;
+    const prevIndex = (activeIndex - 1 + total) % total;
+    const nextIndex = (activeIndex + 1) % total;
+    return [
+      { item: carouselItems[prevIndex], slot: -1 },
+      { item: carouselItems[activeIndex], slot: 0 },
+      { item: carouselItems[nextIndex], slot: 1 },
+    ];
+  };
 
-    const isActive = normalizedDiff === 0;
-    const isAdjacent = Math.abs(normalizedDiff) === 1;
-    const isVisible = Math.abs(normalizedDiff) <= 2;
-
-    if (!isVisible) {
-      return {
-        transform: `translateX(${normalizedDiff * 100}%) scale(0.5)`,
-        opacity: 0,
-        zIndex: 0,
-      };
-    }
-
-    const translateX = normalizedDiff * 320;
-    const rotateY = normalizedDiff * -25;
-    const scale = isActive ? 1 : isAdjacent ? 0.85 : 0.7;
-    const opacity = isActive ? 1 : isAdjacent ? 0.7 : 0.4;
-    const zIndex = isActive ? 30 : isAdjacent ? 20 : 10;
-
+  const getSlotStyle = (slot: number): React.CSSProperties => {
+    const isActive = slot === 0;
+    // Active card: 400×280. Side cards: 300×210, offset by ±370px, slight Y perspective tilt.
+    const translateX = slot * 370;
+    const rotateY = slot * -20;
+    const scale = isActive ? 1 : 0.82;
+    const opacity = isActive ? 1 : 0.55;
+    const zIndex = isActive ? 30 : 10;
     return {
       transform: `translateX(${translateX}px) rotateY(${rotateY}deg) scale(${scale})`,
       opacity,
       zIndex,
+      transition: "transform 500ms cubic-bezier(0.4,0,0.2,1), opacity 500ms ease",
     };
   };
 
   const activeItem = carouselItems[activeIndex];
   const activeColors = textColors[activeItem.id] || { primary: "#ffffff", secondary: "rgba(255, 255, 255, 0.6)" };
+
+  const slots = getSlots();
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
@@ -214,29 +212,36 @@ export function HeroCarousel() {
         </h1>
       </div>
 
-      {/* 3D Carousel */}
-      <div className="carousel-container relative flex h-[500px] w-full items-center justify-center">
-        {carouselItems.map((item, index) => {
-          const style = getItemStyle(index);
-          const isActive = index === activeIndex;
+      {/* 3D Carousel — perspective wrapper clips overflow */}
+      <div
+        className="relative flex h-[380px] w-full items-center justify-center"
+        style={{ perspective: "1200px", perspectiveOrigin: "50% 50%" }}
+      >
+        {/*
+          Mask: hard left/right fade so side cards dissolve at the edge
+          rather than hard-clipping or bleeding off screen.
+        */}
+        <div
+          className="pointer-events-none absolute inset-0 z-40"
+          style={{
+            background:
+              "linear-gradient(to right, var(--background) 0%, transparent 18%, transparent 82%, var(--background) 100%)",
+          }}
+        />
 
+        {slots.map(({ item, slot }) => {
+          const isActive = slot === 0;
           return (
             <div
               key={item.id}
-              className="carousel-item absolute transition-all duration-500 ease-out"
-              style={{
-                transform: style.transform,
-                opacity: style.opacity,
-                zIndex: style.zIndex,
-              }}
+              className="absolute"
+              style={getSlotStyle(slot)}
             >
               <div
-                className={`relative overflow-hidden rounded-2xl ${
-                  isActive ? "shadow-2xl shadow-white/10" : ""
-                }`}
+                className={`relative overflow-hidden rounded-2xl ${isActive ? "shadow-2xl shadow-white/10" : ""}`}
                 style={{
-                  width: isActive ? "400px" : "320px",
-                  height: isActive ? "280px" : "220px",
+                  width: isActive ? "400px" : "300px",
+                  height: isActive ? "280px" : "210px",
                 }}
               >
                 <Image
@@ -248,29 +253,30 @@ export function HeroCarousel() {
                   priority={isActive}
                   loading="eager"
                 />
-                {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               </div>
             </div>
           );
         })}
 
-        {/* Center content overlay */}
-        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
-          <h2 
-            className="mb-4 text-5xl font-bold tracking-tight md:text-6xl transition-colors duration-500"
-            style={{ 
-              textShadow: activeColors.primary === "#ffffff" 
-                ? "0 2px 20px rgba(0,0,0,0.5)" 
-                : "0 2px 20px rgba(255,255,255,0.3)"
+        {/* Center content overlay — sits above the mask */}
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
+          <h2
+            className="mb-4 text-5xl font-bold tracking-tight md:text-6xl"
+            style={{
+              transition: "color 500ms ease",
+              textShadow:
+                activeColors.primary === "#ffffff"
+                  ? "0 2px 20px rgba(0,0,0,0.5)"
+                  : "0 2px 20px rgba(255,255,255,0.3)",
             }}
           >
             {activeItem.title.split(" ").map((word, i) => (
               <span
                 key={i}
-                className="transition-colors duration-500"
-                style={{ 
-                  color: i === 0 ? activeColors.primary : activeColors.secondary 
+                style={{
+                  color: i === 0 ? activeColors.primary : activeColors.secondary,
+                  transition: "color 500ms ease",
                 }}
               >
                 {word}{" "}
@@ -279,14 +285,17 @@ export function HeroCarousel() {
           </h2>
           <a
             href={activeItem.link}
-            className="pointer-events-auto flex h-12 items-center justify-center rounded-full border px-8 text-sm font-medium backdrop-blur-sm transition-all duration-500 hover:scale-105"
+            className="pointer-events-auto flex h-12 items-center justify-center rounded-full border px-8 text-sm font-medium backdrop-blur-sm hover:scale-105"
             style={{
-              backgroundColor: activeColors.primary === "#ffffff" 
-                ? "rgba(255, 255, 255, 0.15)" 
-                : "rgba(0, 0, 0, 0.15)",
-              borderColor: activeColors.primary === "#ffffff" 
-                ? "rgba(255, 255, 255, 0.3)" 
-                : "rgba(0, 0, 0, 0.3)",
+              transition: "color 500ms ease, background-color 500ms ease, border-color 500ms ease, transform 200ms ease",
+              backgroundColor:
+                activeColors.primary === "#ffffff"
+                  ? "rgba(255,255,255,0.15)"
+                  : "rgba(0,0,0,0.15)",
+              borderColor:
+                activeColors.primary === "#ffffff"
+                  ? "rgba(255,255,255,0.3)"
+                  : "rgba(0,0,0,0.3)",
               color: activeColors.primary,
             }}
           >
