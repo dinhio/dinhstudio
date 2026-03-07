@@ -151,6 +151,7 @@ export function HeroCarousel() {
                   sizes="(max-width: 768px) 100vw, 400px"
                   className="object-cover"
                   priority={isActive}
+                  loading="eager"
                 />
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
