@@ -62,16 +62,23 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
           }}
         />
 
-        <div className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          {/* Logo */}
+        {/*
+          Three-column grid on desktop so the logo (left) and button (right)
+          each occupy one equal column, and the nav links sit in the true
+          centre column — they can never overlap regardless of content width.
+          On mobile collapses to justify-between for logo + controls.
+        */}
+        <div className="relative mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 py-4 md:grid-cols-[1fr_auto_1fr]">
+
+          {/* Col 1 — Logo (left-aligned) */}
           <Link
             href="/"
-            className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
+            className="justify-self-start text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
           </Link>
 
-          {/* Desktop centre nav links */}
+          {/* Col 2 — Desktop centre nav links (truly centred) */}
           <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -84,8 +91,11 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
             ))}
           </nav>
 
-          {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
-          <div className="flex items-center gap-3">
+          {/* On mobile col 2 is empty — keeps grid balanced */}
+          <span className="md:hidden" />
+
+          {/* Col 3 — Right side controls (right-aligned) */}
+          <div className="justify-self-end flex items-center gap-3">
             <Link
               href="/contact"
               className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
