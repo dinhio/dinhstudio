@@ -102,6 +102,8 @@ function getSlotStyle(slot: Slot): React.CSSProperties {
   };
 }
 
+const SWIPE_THRESHOLD = 40; // px required to trigger a swipe
+
 export function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(2);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -110,6 +112,10 @@ export function HeroCarousel() {
     Record<number, { primary: string; secondary: string; glow: string }>
   >({});
   const analyzedRef = useRef<Set<number>>(new Set());
+
+  // Swipe / drag tracking
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const isDragging = useRef(false);
 
   const navigate = useCallback(
     (direction: "prev" | "next") => {
@@ -139,6 +145,59 @@ export function HeroCarousel() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [navigate]);
+
+  // ── Pointer (mouse + stylus) handlers ────────────────────────────────────
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    dragStart.current = { x: e.clientX, y: e.clientY };
+    isDragging.current = false;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragStart.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    if (Math.abs(dx) > 8) isDragging.current = true;
+  }, []);
+
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragStart.current) return;
+      const dx = e.clientX - dragStart.current.x;
+      dragStart.current = null;
+      if (!isDragging.current) return;
+      if (dx < -SWIPE_THRESHOLD) navigate("next");
+      else if (dx > SWIPE_THRESHOLD) navigate("prev");
+    },
+    [navigate]
+  );
+
+  const onPointerCancel = useCallback(() => {
+    dragStart.current = null;
+    isDragging.current = false;
+  }, []);
+
+  // ── Touch handlers (passive-safe, no preventDefault needed here) ─────────
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }, []);
+
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (!touchStart.current) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStart.current.x;
+      const dy = t.clientY - touchStart.current.y;
+      touchStart.current = null;
+      // Only trigger if horizontal swipe is dominant
+      if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
+      if (dx < 0) navigate("next");
+      else navigate("prev");
+    },
+    [navigate]
+  );
 
   // Analyze every image once on mount
   useEffect(() => {
@@ -184,10 +243,16 @@ export function HeroCarousel() {
         </h1>
       </div>
 
-      {/* Carousel track */}
+      {/* Carousel track — drag / swipe area */}
       <div
-        className="relative flex h-[400px] w-full items-center justify-center"
-        style={{ perspective: "1400px", perspectiveOrigin: "50% 50%" }}
+        className="relative flex h-[400px] w-full items-center justify-center select-none"
+        style={{ perspective: "1400px", perspectiveOrigin: "50% 50%", cursor: isDragging.current ? "grabbing" : "grab" }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         {/*
           Edge fade masks: dissolve side cards into the background at the
@@ -282,30 +347,53 @@ export function HeroCarousel() {
         </div>
       </div>
 
-      {/* Navigation arrows */}
-      <div className="absolute bottom-16 z-50 flex items-center gap-2">
-        <button
-          onClick={() => navigate("prev")}
-          disabled={isAnimating}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground transition-all hover:scale-110 disabled:opacity-50 glow-accent"
-          aria-label="Previous project"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <button
-          onClick={() => navigate("next")}
-          disabled={isAnimating}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground transition-all hover:scale-110 disabled:opacity-50 glow-accent"
-          aria-label="Next project"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
+      {/* Subtle side arrow indicators — positioned at far edges below carousel */}
+      <button
+        onClick={() => navigate("prev")}
+        disabled={isAnimating}
+        aria-label="Previous project"
+        className="absolute left-4 md:left-8 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/40 backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:text-white/80 hover:bg-white/10 disabled:opacity-20"
+        style={{ top: "calc(50% + 200px)" }}
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => navigate("next")}
+        disabled={isAnimating}
+        aria-label="Next project"
+        className="absolute right-4 md:right-8 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/40 backdrop-blur-sm transition-all duration-300 hover:border-white/40 hover:text-white/80 hover:bg-white/10 disabled:opacity-20"
+        style={{ top: "calc(50% + 200px)" }}
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute z-50 flex items-center gap-1.5" style={{ top: "calc(50% + 220px)" }}>
+        {carouselItems.map((item, i) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              if (isAnimating || i === activeIndex) return;
+              setIsAnimating(true);
+              setActiveIndex(i);
+              setSlotMap(buildSlotMap(i));
+              setTimeout(() => setIsAnimating(false), 550);
+            }}
+            aria-label={`Go to ${item.title}`}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width: i === activeIndex ? "20px" : "6px",
+              height: "6px",
+              backgroundColor: i === activeIndex ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.25)",
+            }}
+          />
+        ))}
       </div>
 
       {/* Explore */}
       <a
         href="#content"
-        className="absolute bottom-32 z-50 flex flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute bottom-10 z-50 flex flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
       >
         <span className="text-sm font-medium tracking-wide">Explore</span>
         <div className="h-8 w-px animate-pulse bg-gradient-to-b from-muted-foreground to-transparent" />
