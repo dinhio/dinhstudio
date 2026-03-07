@@ -393,10 +393,17 @@ export function HeroCarousel() {
       {/* Explore */}
       <a
         href="#content"
-        className="absolute bottom-10 z-50 flex flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+        className="absolute bottom-10 z-50 flex flex-col items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
       >
-        <span className="text-sm font-medium tracking-wide">Explore</span>
-        <div className="h-8 w-px animate-pulse bg-gradient-to-b from-muted-foreground to-transparent" />
+        <span className="animate-pulse text-sm font-medium tracking-widest uppercase">Explore</span>
+        {/* Thin downward arrow: stem + chevron tip */}
+        <span className="animate-pulse flex flex-col items-center gap-0">
+          <span className="block w-px h-5 bg-gradient-to-b from-muted-foreground to-muted-foreground/40" />
+          {/* Arrowhead via two angled lines */}
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="opacity-70">
+            <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
       </a>
     </div>
   );
