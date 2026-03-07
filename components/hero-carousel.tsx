@@ -177,8 +177,8 @@ export function HeroCarousel() {
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
-      {/* Logo */}
-      <div className="absolute top-8 left-1/2 z-50 -translate-x-1/2">
+      {/* Logo — hidden on mobile to avoid clash with the fixed nav top-bar */}
+      <div className="absolute top-8 left-1/2 z-50 -translate-x-1/2 hidden md:block">
         <h1 className="text-2xl font-bold tracking-tight text-foreground font-sans">
           dinhstudio
         </h1>

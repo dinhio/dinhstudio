@@ -15,30 +15,40 @@ const navLinks = [
 ];
 
 export function Navbar({ alwaysVisible = false }: NavbarProps) {
-  const [isVisible, setIsVisible] = useState(alwaysVisible);
-  const [hasScrolled, setHasScrolled] = useState(false);
+  const [navVisible, setNavVisible] = useState(alwaysVisible);
+  const [bgOpacity, setBgOpacity] = useState(alwaysVisible ? 1 : 0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     if (alwaysVisible) {
-      setIsVisible(true);
+      setNavVisible(true);
+      setBgOpacity(1);
       return;
     }
 
     const handleScroll = () => {
       const heroHeight = window.innerHeight;
-      const scrolled = window.scrollY > heroHeight * 0.8;
-      setIsVisible(scrolled);
-      setHasScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+
+      // Slide nav in once past 80% of hero
+      setNavVisible(scrollY > heroHeight * 0.8);
+
+      // Smoothly ramp background opacity from 0→1 as user scrolls
+      // from 10% of hero height to 30% past it
+      const start = heroHeight * 0.1;
+      const end = heroHeight * 1.3;
+      const clamped = Math.min(Math.max((scrollY - start) / (end - start), 0), 1);
+      setBgOpacity(clamped);
+
       // Close mobile menu on scroll
       if (mobileOpen) setMobileOpen(false);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [alwaysVisible, mobileOpen]);
 
-  // Prevent body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -46,41 +56,28 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
 
   return (
     <>
-      {/* ── Fixed top bar: logo (mobile) + Get in Touch ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 md:hidden">
-        {/* Mobile logo — visible only before the nav slides in */}
+      {/* ─── Mobile fixed top bar: "Get in touch" + hamburger only ─── */}
+      {/* The hero already shows the dinhstudio logo centred on mobile,  */}
+      {/* so we don't repeat it here to avoid clashing.                  */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-end gap-3 px-5 py-4 md:hidden">
         <Link
-          href="/"
-          className={`text-xl font-bold tracking-tight text-foreground transition-all duration-500 ${
-            isVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}
-          aria-hidden={isVisible}
-          tabIndex={isVisible ? -1 : 0}
+          href="/contact"
+          className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
         >
-          dinhstudio
+          Get in touch
         </Link>
-
-        {/* Right side: Get in Touch + hamburger */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/contact"
-            className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
-          >
-            Get in touch
-          </Link>
-          <button
-            onClick={() => setMobileOpen((o) => !o)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
+        <button
+          onClick={() => setMobileOpen((o) => !o)}
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
+        >
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
 
-      {/* ── Desktop: fixed Get in Touch always visible ── */}
+      {/* ─── Desktop: always-visible "Get in touch" ─── */}
       <div className="fixed top-6 right-6 z-50 hidden md:block">
         <Link
           href="/contact"
@@ -90,28 +87,38 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         </Link>
       </div>
 
-      {/* ── Main navbar — slides in after scroll (desktop + mobile) ── */}
+      {/* ─── Main navbar — slides down after scrolling past hero ─── */}
       <nav
         id="main-nav"
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-        }`}
-        aria-hidden={!isVisible}
+        aria-hidden={!navVisible}
+        className="fixed top-0 left-0 right-0 z-40 transition-transform duration-500 ease-in-out"
+        style={{
+          transform: navVisible ? "translateY(0)" : "translateY(-100%)",
+        }}
       >
+        {/*
+          Background is a separate element so opacity can transition
+          independently of the nav content (avoids text fading in/out).
+        */}
         <div
-          className={`mx-auto flex max-w-7xl items-center justify-between px-5 py-4 transition-all duration-300 ${
-            hasScrolled || alwaysVisible ? "bg-background/80 backdrop-blur-lg" : ""
-          }`}
-        >
+          aria-hidden
+          className="absolute inset-0 backdrop-blur-lg transition-opacity duration-500"
+          style={{
+            backgroundColor: "var(--background)",
+            opacity: bgOpacity * 0.85,
+          }}
+        />
+
+        <div className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
           {/* Logo */}
           <Link
             href="/"
-            className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70"
+            className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
           </Link>
 
-          {/* Desktop center nav links */}
+          {/* Desktop centre nav links */}
           <div className="hidden items-center gap-8 md:flex">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -124,7 +131,7 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
             ))}
           </div>
 
-          {/* Desktop spacer to balance the fixed button */}
+          {/* Spacer to visually balance the fixed "Get in touch" button */}
           <div className="hidden w-[120px] md:block" />
 
           {/* Mobile hamburger inside the scrolled nav bar */}
@@ -140,21 +147,24 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         </div>
       </nav>
 
-      {/* ── Mobile full-screen menu ── */}
+      {/* ─── Mobile full-screen overlay menu ─── */}
       <div
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className={`fixed inset-0 z-[45] flex flex-col bg-background transition-all duration-400 md:hidden ${
-          mobileOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
+        className="fixed inset-0 z-[45] flex flex-col bg-background md:hidden"
+        style={{
+          opacity: mobileOpen ? 1 : 0,
+          pointerEvents: mobileOpen ? "auto" : "none",
+          transition: "opacity 350ms ease",
+        }}
       >
-        {/* Close row */}
+        {/* Header row */}
         <div className="flex items-center justify-between px-5 py-4">
-          <span className="text-xl font-bold tracking-tight text-foreground">dinhstudio</span>
+          <span className="text-xl font-bold tracking-tight text-foreground font-sans">
+            dinhstudio
+          </span>
           <button
             onClick={() => setMobileOpen(false)}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
@@ -173,9 +183,8 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
               onClick={() => setMobileOpen(false)}
               className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
               style={{
-                transitionDelay: mobileOpen ? `${i * 60}ms` : "0ms",
-                transform: mobileOpen ? "translateY(0)" : "translateY(12px)",
                 opacity: mobileOpen ? 1 : 0,
+                transform: mobileOpen ? "translateY(0)" : "translateY(12px)",
                 transition: `transform 350ms ease ${i * 60}ms, opacity 350ms ease ${i * 60}ms, color 200ms ease`,
               }}
             >
