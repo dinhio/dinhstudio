@@ -50,35 +50,26 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         Desktop shows centre links; mobile hides them behind hamburger.
       */}
       <header className="fixed top-0 left-0 right-0 z-50">
-        {/* Fading background layer — separate div so text/button opacity is never affected */}
+        {/* Fading background layer — separate so content opacity is unaffected */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 md:backdrop-blur-md"
+          className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
           style={{
             backgroundColor: "var(--background)",
-            opacity: bgOpacity,
-            transition: "opacity 200ms linear",
-            willChange: "opacity",
+            opacity: bgOpacity * 0.92,
           }}
         />
 
-        {/*
-          Three-column grid on desktop so the logo (left) and button (right)
-          each occupy one equal column, and the nav links sit in the true
-          centre column — they can never overlap regardless of content width.
-          On mobile collapses to justify-between for logo + controls.
-        */}
-        <div className="relative mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-5 py-4 md:grid-cols-[1fr_auto_1fr]">
-
-          {/* Col 1 — Logo (left-aligned) */}
+        <div className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+          {/* Logo */}
           <Link
             href="/"
-            className="justify-self-start text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
+            className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
           </Link>
 
-          {/* Col 2 — Desktop centre nav links (truly centred) */}
+          {/* Desktop centre nav links */}
           <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -91,11 +82,8 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
             ))}
           </nav>
 
-          {/* On mobile col 2 is empty — keeps grid balanced */}
-          <span className="md:hidden" />
-
-          {/* Col 3 — Right side controls (right-aligned) */}
-          <div className="justify-self-end flex items-center gap-3">
+          {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
+          <div className="flex items-center gap-3">
             <Link
               href="/contact"
               className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
@@ -118,13 +106,12 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
       </header>
 
       {/* ── Mobile full-screen overlay menu ──────────────────────────────── */}
-      {/* z-[45] — above page content but below the z-50 header so logo/button stay on top */}
       <div
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className="fixed inset-0 z-[45] flex flex-col bg-background md:hidden"
+        className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? "auto" : "none",
