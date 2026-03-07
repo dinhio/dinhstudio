@@ -12,10 +12,10 @@ interface CarouselItem {
 }
 
 const carouselItems: CarouselItem[] = [
-  { id: 1, title: "Artisan Bloom",  image: "/carousel/project-1.jpg", link: "/work/artisan-bloom"  },
-  { id: 2, title: "Neotech Labs",   image: "/carousel/project-2.jpg", link: "/work/neotech-labs"   },
-  { id: 3, title: "Verdant Co",     image: "/carousel/project-3.jpg", link: "/work/verdant-co"     },
-  { id: 4, title: "Lumina Studio",  image: "/carousel/project-4.jpg", link: "/work/lumina-studio"  },
+  { id: 1, title: "Artisan Bloom", image: "/carousel/project-1.jpg", link: "/work/artisan-bloom" },
+  { id: 2, title: "Neotech Labs", image: "/carousel/project-2.jpg", link: "/work/neotech-labs" },
+  { id: 3, title: "Verdant Co", image: "/carousel/project-3.jpg", link: "/work/verdant-co" },
+  { id: 4, title: "Lumina Studio", image: "/carousel/project-4.jpg", link: "/work/lumina-studio" },
   { id: 5, title: "Aurora Digital", image: "/carousel/project-5.jpg", link: "/work/aurora-digital" },
 ];
 
@@ -32,9 +32,9 @@ function buildSlotMap(activeIndex: number): Record<number, Slot> {
   const next = (activeIndex + 1) % TOTAL;
 
   carouselItems.forEach((_, i) => {
-    if (i === activeIndex)             map[i] = 0;
-    else if (i === prev)               map[i] = -1;
-    else if (i === next)               map[i] = 1;
+    if (i === activeIndex) map[i] = 0;
+    else if (i === prev) map[i] = -1;
+    else if (i === next) map[i] = 1;
     else {
       // Hide everything else off to the left staging area by default
       map[i] = -2;
@@ -82,13 +82,13 @@ function analyzeImageBrightness(
 
 function getSlotStyle(slot: Slot): React.CSSProperties {
   // Slots ±2 are invisible staging positions far off-screen
-  const OFFSET   = 400;  // px between adjacent visible cards
-  const STAGE    = 900;  // px for hidden staging positions
-  const x        = slot === -2 ? -STAGE : slot === 2 ? STAGE : slot * OFFSET;
-  const rotateY  = slot === 0 ? 0 : slot < 0 ? 18 : -18;
-  const scale    = slot === 0 ? 1 : Math.abs(slot) === 1 ? 0.80 : 0.65;
-  const opacity  = slot === 0 ? 1 : Math.abs(slot) === 1 ? 0.50 : 0;
-  const zIndex   = slot === 0 ? 30 : Math.abs(slot) === 1 ? 10 : 0;
+  const OFFSET = 400;  // px between adjacent visible cards
+  const STAGE = 900;  // px for hidden staging positions
+  const x = slot === -2 ? -STAGE : slot === 2 ? STAGE : slot * OFFSET;
+  const rotateY = slot === 0 ? 0 : slot < 0 ? 18 : -18;
+  const scale = slot === 0 ? 1 : Math.abs(slot) === 1 ? 0.80 : 0.65;
+  const opacity = slot === 0 ? 1 : Math.abs(slot) === 1 ? 0.50 : 0;
+  const zIndex = slot === 0 ? 30 : Math.abs(slot) === 1 ? 10 : 0;
 
   return {
     transform: `translateX(${x}px) rotateY(${rotateY}deg) scale(${scale})`,
@@ -133,7 +133,7 @@ export function HeroCarousel() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft")  navigate("prev");
+      if (e.key === "ArrowLeft") navigate("prev");
       if (e.key === "ArrowRight") navigate("next");
     };
     window.addEventListener("keydown", handler);
@@ -151,15 +151,15 @@ export function HeroCarousel() {
 
         if (isDark) {
           updates[item.id] = {
-            primary:   "#ffffff",
+            primary: "#ffffff",
             secondary: "rgba(255,255,255,0.65)",
-            glow:      "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)",
+            glow: "0 0 24px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)",
           };
         } else {
           updates[item.id] = {
-            primary:   "#0a0a0a",
+            primary: "#0a0a0a",
             secondary: "rgba(10,10,10,0.65)",
-            glow:      "0 0 24px rgba(255,255,255,0.9), 0 2px 8px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,1)",
+            glow: "0 0 24px rgba(255,255,255,0.6), 0 2px 8px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,1)",
           };
         }
       }
@@ -168,11 +168,11 @@ export function HeroCarousel() {
     run();
   }, []);
 
-  const activeItem  = carouselItems[activeIndex];
+  const activeItem = carouselItems[activeIndex];
   const activeColor = textColors[activeItem.id] ?? {
-    primary:   "#ffffff",
+    primary: "#ffffff",
     secondary: "rgba(255,255,255,0.65)",
-    glow:      "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
+    glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
   };
 
   return (
@@ -203,7 +203,7 @@ export function HeroCarousel() {
         />
 
         {carouselItems.map((item, index) => {
-          const slot    = (slotMap[index] ?? -2) as Slot;
+          const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
 
           return (
@@ -213,11 +213,10 @@ export function HeroCarousel() {
               style={getSlotStyle(slot)}
             >
               <div
-                className={`relative overflow-hidden rounded-2xl ${
-                  isActive ? "ring-1 ring-white/10 shadow-2xl shadow-black/60" : ""
-                }`}
+                className={`relative overflow-hidden rounded-2xl ${isActive ? "ring-1 ring-white/10 shadow-2xl shadow-black/60" : ""
+                  }`}
                 style={{
-                  width:  isActive ? "clamp(280px, 40vw, 420px)" : "clamp(200px, 28vw, 310px)",
+                  width: isActive ? "clamp(280px, 40vw, 420px)" : "clamp(200px, 28vw, 310px)",
                   height: isActive ? "clamp(196px, 28vw, 294px)" : "clamp(140px, 20vw, 218px)",
                   transition: "width 550ms cubic-bezier(0.4,0,0.2,1), height 550ms cubic-bezier(0.4,0,0.2,1)",
                 }}
@@ -249,7 +248,7 @@ export function HeroCarousel() {
                 key={i}
                 style={{
                   display: "inline-block",
-                  color:      i === 0 ? activeColor.primary : activeColor.secondary,
+                  color: i === 0 ? activeColor.primary : activeColor.secondary,
                   textShadow: activeColor.glow,
                   transition: "color 500ms ease, text-shadow 500ms ease",
                   marginRight: "0.3em",
