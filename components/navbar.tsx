@@ -15,33 +15,21 @@ const navLinks = [
 ];
 
 export function Navbar({ alwaysVisible = false }: NavbarProps) {
-  const [navVisible, setNavVisible] = useState(alwaysVisible);
   const [bgOpacity, setBgOpacity] = useState(alwaysVisible ? 1 : 0);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     if (alwaysVisible) {
-      setNavVisible(true);
       setBgOpacity(1);
       return;
     }
 
     const handleScroll = () => {
-      const heroHeight = window.innerHeight;
       const scrollY = window.scrollY;
-
-      // Slide nav in once past 80% of hero
-      setNavVisible(scrollY > heroHeight * 0.8);
-
-      // Smoothly ramp background opacity from 0→1 as user scrolls
-      // from 10% of hero height to 30% past it
-      const start = heroHeight * 0.1;
-      const end = heroHeight * 1.3;
-      const clamped = Math.min(Math.max((scrollY - start) / (end - start), 0), 1);
-      setBgOpacity(clamped);
-
-      // Close mobile menu on scroll
-      if (mobileOpen) setMobileOpen(false);
+      // Fade background in over the first 120px of scroll
+      const opacity = Math.min(scrollY / 120, 1);
+      setBgOpacity(opacity);
+      if (mobileOpen && scrollY > 10) setMobileOpen(false);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -56,55 +44,19 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
 
   return (
     <>
-      {/* ─── Mobile fixed top bar: logo (left) + "Get in touch" + hamburger (right) ─── */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 md:hidden">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-xl font-bold tracking-tight text-foreground font-sans"
-        >
-          dinhstudio
-        </Link>
-
-        {/* Right side controls */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/contact"
-            className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
-          >
-            Get in touch
-          </Link>
-          <button
-            onClick={() => setMobileOpen((o) => !o)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* ─── Main navbar — always in DOM; slides down after scrolling past hero ─── */}
-      <nav
-        id="main-nav"
-        aria-hidden={!navVisible}
-        className="fixed top-0 left-0 right-0 z-50 transition-transform duration-500 ease-in-out"
-        style={{
-          transform: navVisible ? "translateY(0)" : "translateY(-100%)",
-        }}
-      >
-        {/*
-          Background is a separate element so opacity can transition
-          independently of the nav content (avoids text fading in/out).
-        */}
+      {/*
+        ── Single unified fixed navbar ──────────────────────────────────────
+        One element for all screen sizes. Background fades in on scroll.
+        Desktop shows centre links; mobile hides them behind hamburger.
+      */}
+      <header className="fixed top-0 left-0 right-0 z-50">
+        {/* Fading background layer — separate so content opacity is unaffected */}
         <div
           aria-hidden
-          className="absolute inset-0 backdrop-blur-lg transition-opacity duration-500"
+          className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
           style={{
             backgroundColor: "var(--background)",
-            opacity: bgOpacity * 0.85,
+            opacity: bgOpacity * 0.92,
           }}
         />
 
@@ -118,7 +70,7 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
           </Link>
 
           {/* Desktop centre nav links */}
-          <div className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
@@ -128,60 +80,49 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
                 {label}
               </Link>
             ))}
-          </div>
+          </nav>
 
-          {/* "Get in touch" — always visible, inside the navbar row */}
-          <div className="hidden md:block">
+          {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
+          <div className="flex items-center gap-3">
             <Link
               href="/contact"
-              className="flex h-9 items-center justify-center rounded-full bg-foreground px-5 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
+              className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
             >
               Get in touch
             </Link>
+
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMobileOpen((o) => !o)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
-
-          {/* Mobile hamburger inside the scrolled nav bar */}
-          <button
-            onClick={() => setMobileOpen((o) => !o)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
         </div>
-      </nav>
+      </header>
 
-      {/* ─── Mobile full-screen overlay menu ─── */}
+      {/* ── Mobile full-screen overlay menu ──────────────────────────────── */}
       <div
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className="fixed inset-0 z-[45] flex flex-col bg-background md:hidden"
+        className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? "auto" : "none",
-          transition: "opacity 350ms ease",
+          transition: "opacity 300ms ease",
         }}
       >
-        {/* Header row */}
-        <div className="flex items-center justify-between px-5 py-4">
-          <span className="text-xl font-bold tracking-tight text-foreground font-sans">
-            dinhstudio
-          </span>
-          <button
-            onClick={() => setMobileOpen(false)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        {/* Spacer so links sit below the header bar */}
+        <div className="h-[65px]" />
 
         {/* Nav links */}
-        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8">
+        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label="Mobile navigation">
           {navLinks.map(({ href, label }, i) => (
             <Link
               key={href}
@@ -191,7 +132,7 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
               style={{
                 opacity: mobileOpen ? 1 : 0,
                 transform: mobileOpen ? "translateY(0)" : "translateY(12px)",
-                transition: `transform 350ms ease ${i * 60}ms, opacity 350ms ease ${i * 60}ms, color 200ms ease`,
+                transition: `transform 350ms ease ${i * 60 + 50}ms, opacity 350ms ease ${i * 60 + 50}ms, color 200ms ease`,
               }}
             >
               {label}
