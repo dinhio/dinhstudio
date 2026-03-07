@@ -56,25 +56,34 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
 
   return (
     <>
-      {/* ─── Mobile fixed top bar: "Get in touch" + hamburger only ─── */}
-      {/* The hero already shows the dinhstudio logo centred on mobile,  */}
-      {/* so we don't repeat it here to avoid clashing.                  */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-end gap-3 px-5 py-4 md:hidden">
+      {/* ─── Mobile fixed top bar: logo (left) + "Get in touch" + hamburger (right) ─── */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 md:hidden">
+        {/* Logo */}
         <Link
-          href="/contact"
-          className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
+          href="/"
+          className="text-xl font-bold tracking-tight text-foreground font-sans"
         >
-          Get in touch
+          dinhstudio
         </Link>
-        <button
-          onClick={() => setMobileOpen((o) => !o)}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          aria-controls="mobile-menu"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+
+        {/* Right side controls */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/contact"
+            className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
+          >
+            Get in touch
+          </Link>
+          <button
+            onClick={() => setMobileOpen((o) => !o)}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* ─── Desktop: always-visible "Get in touch" ─── */}
