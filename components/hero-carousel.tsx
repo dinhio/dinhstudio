@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useReducer } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -332,7 +333,7 @@ export function HeroCarousel() {
             ))}
           </h2>
 
-          <a
+          <Link
             href={activeItem.link}
             className="pointer-events-auto flex h-11 items-center justify-center rounded-full border px-8 text-sm font-medium backdrop-blur-md hover:scale-105 focus-visible:outline-none focus-visible:ring-2"
             style={{
@@ -345,7 +346,7 @@ export function HeroCarousel() {
             }}
           >
             View Case
-          </a>
+          </Link>
         </div>
       </div>
 
