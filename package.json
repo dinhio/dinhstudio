@@ -9,7 +9,8 @@
     "lint": "eslint",
     "bench:carousel": "node scripts/benchmark-carousel.mjs",
     "bench:carousel:network": "node scripts/benchmark-carousel-network.mjs",
-    "bench:carousel:mainthread": "node scripts/benchmark-carousel-mainthread.mjs"
+    "bench:carousel:mainthread": "node scripts/benchmark-carousel-mainthread.mjs",
+    "test:e2e:carousel": "playwright test tests/carousel.spec.ts --project=chromium"
   },
   "dependencies": {
     "framer-motion": "^12.35.1",
@@ -19,6 +20,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

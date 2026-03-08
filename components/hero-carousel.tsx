@@ -301,6 +301,7 @@ export function HeroCarousel() {
 
       {/* Carousel track — drag / swipe area */}
       <div
+        data-testid="carousel-track"
         className="relative flex h-[400px] w-full items-center justify-center select-none"
         style={{ perspective: "1400px", perspectiveOrigin: "50% 50%", cursor: isDraggingCursor ? "grabbing" : "grab" }}
         onPointerDown={onPointerDown}
@@ -332,6 +333,8 @@ export function HeroCarousel() {
           return (
             <motion.div
               key={item.id}
+              data-carousel-item={item.id}
+              data-carousel-title={item.title}
               className="absolute"
               initial={false}
               animate={{
