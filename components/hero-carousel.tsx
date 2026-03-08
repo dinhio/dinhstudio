@@ -44,42 +44,6 @@ function buildSlotMap(activeIndex: number): Record<number, Slot> {
   return map;
 }
 
-// Canvas-based brightness analysis
-function analyzeImageBrightness(
-  imageSrc: string
-): Promise<{ isDark: boolean }> {
-  return new Promise((resolve) => {
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) { resolve({ isDark: true }); return; }
-
-      const w = Math.min(120, img.width);
-      const h = Math.min(90, img.height);
-      canvas.width = w;
-      canvas.height = h;
-
-      ctx.drawImage(
-        img,
-        (img.width - w) / 2, (img.height - h) / 2, w, h,
-        0, 0, w, h
-      );
-
-      const { data } = ctx.getImageData(0, 0, w, h);
-      let lum = 0, count = 0;
-      for (let i = 0; i < data.length; i += 16) {
-        lum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        count++;
-      }
-      resolve({ isDark: lum / count / 255 < 0.5 });
-    };
-    img.onerror = () => resolve({ isDark: true });
-    img.src = imageSrc;
-  });
-}
-
 function getSlotStyle(slot: Slot): React.CSSProperties {
   // Slots ±2 are invisible staging positions far off-screen
   const OFFSET = 400;  // px between adjacent visible cards
@@ -109,10 +73,6 @@ export function HeroCarousel() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
   const [slotMap, setSlotMap] = useState<Record<number, Slot>>(() => buildSlotMap(2));
-  const [textColors, setTextColors] = useState<
-    Record<number, { primary: string; secondary: string; glow: string }>
-  >({});
-  const analyzedRef = useRef<Set<number>>(new Set());
 
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -203,36 +163,23 @@ export function HeroCarousel() {
     [navigate]
   );
 
-  // Analyze every image once on mount
+  // Keep upcoming slides warm for faster first interactions on slower networks.
   useEffect(() => {
-    const run = async () => {
-      const updates: typeof textColors = {};
-      for (const item of carouselItems) {
-        if (analyzedRef.current.has(item.id)) continue;
-        const { isDark } = await analyzeImageBrightness(item.image);
-        analyzedRef.current.add(item.id);
+    const prefetchIndices = [
+      (activeIndex + 1) % TOTAL,
+      (activeIndex + 2) % TOTAL,
+      (activeIndex - 1 + TOTAL) % TOTAL,
+    ];
 
-        if (isDark) {
-          updates[item.id] = {
-            primary: "#ffffff",
-            secondary: "rgba(255,255,255,0.65)",
-            glow: "0 0 24px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)",
-          };
-        } else {
-          updates[item.id] = {
-            primary: "#0a0a0a",
-            secondary: "rgba(10,10,10,0.65)",
-            glow: "0 0 24px rgba(255,255,255,0.6), 0 2px 8px rgba(255,255,255,0.7), 0 0 2px rgba(255,255,255,1)",
-          };
-        }
-      }
-      setTextColors((p) => ({ ...p, ...updates }));
-    };
-    run();
-  }, []);
+    prefetchIndices.forEach((i) => {
+      const img = new window.Image();
+      img.decoding = "async";
+      img.src = carouselItems[i].image;
+    });
+  }, [activeIndex]);
 
   const activeItem = carouselItems[activeIndex];
-  const activeColor = textColors[activeItem.id] ?? {
+  const activeColor = {
     primary: "#ffffff",
     secondary: "rgba(255,255,255,0.65)",
     glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
@@ -296,8 +243,8 @@ export function HeroCarousel() {
                   fill
                   sizes="(max-width: 768px) 100vw, 420px"
                   className="object-cover"
-                  priority={isActive}
-                  loading="eager"
+                  priority={isActive || slot === 1}
+                  loading={Math.abs(slot) <= 1 ? "eager" : "lazy"}
                 />
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
