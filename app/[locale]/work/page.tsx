@@ -210,6 +210,27 @@ export default async function WorkPage({
               {dictionary.nav.contact}
             </Link>
           </div>
+          <div className="flex items-center text-xs tracking-wide text-muted-foreground">
+            <Link
+              href="/en-us/work"
+              className={`px-0.5 transition-colors ${normalizedLocale === "en-us"
+                ? "font-bold text-foreground"
+                : "font-medium hover:text-foreground"
+                }`}
+            >
+              EN
+            </Link>
+            <span className="px-1 text-border">/</span>
+            <Link
+              href="/vi-vn/work"
+              className={`px-0.5 transition-colors ${normalizedLocale === "vi-vn"
+                ? "font-bold text-foreground"
+                : "font-medium hover:text-foreground"
+                }`}
+            >
+              VI
+            </Link>
+          </div>
           <div className="text-sm text-muted-foreground">
             {new Date().getFullYear()} dinhstudio
           </div>
