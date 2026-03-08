@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "bench:carousel": "node scripts/benchmark-carousel.mjs",
+    "bench:carousel:network": "node scripts/benchmark-carousel-network.mjs",
+    "bench:carousel:mainthread": "node scripts/benchmark-carousel-mainthread.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -21,6 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "playwright": "^1.58.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
