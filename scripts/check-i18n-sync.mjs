@@ -62,8 +62,8 @@ function loadTsExport(filePath, exportName) {
 }
 
 /**
- * @param {Record<string, unknown>} source
- * @param {Record<string, unknown>} target
+ * @param {unknown} source - Canonical dictionary subtree (object/array/primitive).
+ * @param {unknown} target - Locale dictionary subtree to compare against source.
  * @param {string} basePath
  * @returns {Issue[]}
  */
@@ -142,8 +142,8 @@ function compareKeys(source, target, basePath = "") {
 }
 
 /**
- * @param {Record<string, unknown>} source
- * @param {Record<string, unknown>} target
+ * @param {unknown} source - Canonical dictionary subtree (object/array/primitive).
+ * @param {unknown} target - Locale dictionary subtree to compare against source.
  * @param {string} basePath
  * @returns {Issue[]}
  */
