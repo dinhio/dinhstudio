@@ -126,6 +126,23 @@ export interface TranslationDictionary {
       featured?: boolean;
     }>;
   };
+  contact: {
+    heroTitle: string;
+    heroBody: string;
+    emailLabel: string;
+    responseTimeTitle: string;
+    responseTimeBody: string;
+    basedInTitle: string;
+    basedInBody: string;
+    availabilityTitle: string;
+    availabilityBody: string;
+    nextTitle: string;
+    nextSteps: Array<{
+      step: string;
+      title: string;
+      description: string;
+    }>;
+  };
 }
 
 export const enUS: TranslationDictionary = {
@@ -411,6 +428,36 @@ export const enUS: TranslationDictionary = {
           role: "Partner, Aurora Digital",
         },
         link: "/work/aurora-digital",
+      },
+    ],
+  },
+  contact: {
+    heroTitle: "Let's work together",
+    heroBody:
+      "Have a project in mind? We'd love to hear about it. Drop us a line and let's start a conversation about bringing your vision to life.",
+    emailLabel: "Email us at",
+    responseTimeTitle: "Response Time",
+    responseTimeBody: "We typically respond within 24-48 hours",
+    basedInTitle: "Based In",
+    basedInBody: "Working globally from anywhere",
+    availabilityTitle: "Availability",
+    availabilityBody: "Currently accepting new projects",
+    nextTitle: "What happens next?",
+    nextSteps: [
+      {
+        step: "1",
+        title: "Discovery Call",
+        description: "We'll schedule a call to discuss your project goals, timeline, and budget.",
+      },
+      {
+        step: "2",
+        title: "Proposal",
+        description: "You'll receive a detailed proposal outlining our approach, timeline, and investment.",
+      },
+      {
+        step: "3",
+        title: "Kick-off",
+        description: "Once approved, we'll begin the creative process and bring your vision to life.",
       },
     ],
   },

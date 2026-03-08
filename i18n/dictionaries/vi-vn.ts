@@ -280,4 +280,33 @@ export const viVN = {
       },
     ],
   },
+  contact: {
+    heroTitle: "Hãy cùng làm việc",
+    heroBody: "Bạn có ý tưởng dự án? Chúng tôi rất muốn lắng nghe. Hãy gửi cho chúng tôi một tin nhắn để bắt đầu hành trình đưa tầm nhìn của bạn thành hiện thực.",
+    emailLabel: "Gửi email cho chúng tôi",
+    responseTimeTitle: "Thời gian phản hồi",
+    responseTimeBody: "Chúng tôi thường phản hồi trong vòng 24-48 giờ",
+    basedInTitle: "Địa điểm làm việc",
+    basedInBody: "Làm việc toàn cầu từ bất cứ đâu",
+    availabilityTitle: "Tình trạng nhận dự án",
+    availabilityBody: "Hiện đang nhận thêm dự án mới",
+    nextTitle: "Tiếp theo sẽ như thế nào?",
+    nextSteps: [
+      {
+        step: "1",
+        title: "Buổi trao đổi ban đầu",
+        description: "Chúng tôi sẽ lên lịch cuộc gọi để trao đổi về mục tiêu, thời gian và ngân sách dự án của bạn.",
+      },
+      {
+        step: "2",
+        title: "Đề xuất",
+        description: "Bạn sẽ nhận được bản đề xuất chi tiết về hướng triển khai, tiến độ và chi phí đầu tư.",
+      },
+      {
+        step: "3",
+        title: "Khởi động",
+        description: "Sau khi thống nhất, chúng tôi bắt đầu quy trình sáng tạo để biến ý tưởng của bạn thành hiện thực.",
+      },
+    ],
+  },
 } as const satisfies TranslationDictionary;
