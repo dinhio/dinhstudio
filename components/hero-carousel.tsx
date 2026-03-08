@@ -469,7 +469,7 @@ export function HeroCarousel() {
               backgroundColor: activeColor.ctaBackground,
               borderColor: activeColor.ctaBorder,
               color: activeColor.primary,
-              boxShadow: activeColor.glow,
+              boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
             }}
           >
             View Case
