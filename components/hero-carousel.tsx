@@ -281,14 +281,8 @@ export function HeroCarousel() {
             style={{
               transition:
                 "color 500ms ease, background-color 500ms ease, border-color 500ms ease, box-shadow 500ms ease, transform 200ms ease",
-              backgroundColor:
-                activeColor.primary === "#ffffff"
-                  ? "rgba(255,255,255,0.12)"
-                  : "rgba(0,0,0,0.12)",
-              borderColor:
-                activeColor.primary === "#ffffff"
-                  ? "rgba(255,255,255,0.35)"
-                  : "rgba(0,0,0,0.35)",
+              backgroundColor: "rgba(255,255,255,0.12)",
+              borderColor: "rgba(255,255,255,0.35)",
               color: activeColor.primary,
               boxShadow: activeColor.glow,
             }}
