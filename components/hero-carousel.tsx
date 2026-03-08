@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useReducer } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -73,11 +73,40 @@ function getSlotVisual(slot: Slot) {
 
 const SWIPE_THRESHOLD = 40; // px required to trigger a swipe
 
+interface CarouselState {
+  activeIndex: number;
+  isAnimating: boolean;
+  slotMap: Record<number, Slot>;
+}
+
+type CarouselAction =
+  | { type: "start-navigation"; targetIndex: number; stagingSide: StagingSide }
+  | { type: "complete-animation" };
+
+function carouselReducer(state: CarouselState, action: CarouselAction): CarouselState {
+  if (action.type === "start-navigation") {
+    return {
+      ...state,
+      activeIndex: action.targetIndex,
+      isAnimating: true,
+      slotMap: buildSlotMap(action.targetIndex, action.stagingSide),
+    };
+  }
+
+  return {
+    ...state,
+    isAnimating: false,
+  };
+}
+
 export function HeroCarousel() {
-  const [activeIndex, setActiveIndex] = useState(2);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
-  const [slotMap, setSlotMap] = useState<Record<number, Slot>>(() => buildSlotMap(2));
+  const [carouselState, dispatch] = useReducer(carouselReducer, {
+    activeIndex: 2,
+    isAnimating: false,
+    slotMap: buildSlotMap(2),
+  });
+  const { activeIndex, isAnimating, slotMap } = carouselState;
 
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -86,22 +115,16 @@ export function HeroCarousel() {
   const navigate = useCallback(
     (direction: "prev" | "next") => {
       if (isAnimating) return;
-      setIsAnimating(true);
       const stagingSide: StagingSide = direction === "next" ? -2 : 2;
+      const targetIndex =
+        direction === "next"
+          ? (activeIndex + 1) % TOTAL
+          : (activeIndex - 1 + TOTAL) % TOTAL;
 
-      setActiveIndex((prev) => {
-        const next =
-          direction === "next"
-            ? (prev + 1) % TOTAL
-            : (prev - 1 + TOTAL) % TOTAL;
-
-        setSlotMap(buildSlotMap(next, stagingSide));
-        return next;
-      });
-
-      setTimeout(() => setIsAnimating(false), 550);
+      dispatch({ type: "start-navigation", targetIndex, stagingSide });
+      setTimeout(() => dispatch({ type: "complete-animation" }), 550);
     },
-    [isAnimating]
+    [activeIndex, isAnimating]
   );
 
   useEffect(() => {
@@ -349,10 +372,8 @@ export function HeroCarousel() {
               const backwardDistance = (activeIndex - i + TOTAL) % TOTAL;
               const inferredDirection = forwardDistance <= backwardDistance ? "next" : "prev";
               const stagingSide: StagingSide = inferredDirection === "next" ? -2 : 2;
-              setIsAnimating(true);
-              setActiveIndex(i);
-              setSlotMap(buildSlotMap(i, stagingSide));
-              setTimeout(() => setIsAnimating(false), 550);
+              dispatch({ type: "start-navigation", targetIndex: i, stagingSide });
+              setTimeout(() => dispatch({ type: "complete-animation" }), 550);
             }}
             aria-label={`Go to ${item.title}`}
             className="rounded-full transition-all duration-300"
