@@ -221,6 +221,7 @@ export function HeroCarousel() {
         {carouselItems.map((item, index) => {
           const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
+          const isPriority = isActive || slot === 1;
 
           return (
             <div
@@ -243,8 +244,8 @@ export function HeroCarousel() {
                   fill
                   sizes="(max-width: 768px) 100vw, 420px"
                   className="object-cover"
-                  priority={isActive || slot === 1}
-                  loading={Math.abs(slot) <= 1 ? "eager" : "lazy"}
+                  priority={isPriority}
+                  {...(!isPriority ? { loading: "lazy" as const } : {})}
                 />
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
