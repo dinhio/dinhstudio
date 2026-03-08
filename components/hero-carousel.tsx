@@ -171,10 +171,15 @@ export function HeroCarousel() {
       (activeIndex - 1 + TOTAL) % TOTAL,
     ];
 
+    const nextImageUrl = (path: string, width: number) => {
+      const params = new URLSearchParams({ url: path, w: String(width), q: "75" });
+      return `/_next/image?${params.toString()}`;
+    };
+
     prefetchIndices.forEach((i) => {
       const img = new window.Image();
       img.decoding = "async";
-      img.src = carouselItems[i].image;
+      img.src = nextImageUrl(carouselItems[i].image, 828);
     });
   }, [activeIndex]);
 
