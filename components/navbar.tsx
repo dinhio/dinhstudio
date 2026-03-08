@@ -180,12 +180,15 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           </Link>
 
           {/* Desktop centre nav links */}
-          <nav className="hidden items-center gap-8 md:flex" aria-label={dictionary.nav.mainNavigation}>
+          <nav
+            className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex"
+            aria-label={dictionary.nav.mainNavigation}
+          >
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={withLocale(href)}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className="pointer-events-auto text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 {label}
               </Link>
@@ -193,7 +196,13 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           </nav>
 
           {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-5">
+            <Link
+              href={withLocale("/contact")}
+              className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
+            >
+              {dictionary.nav.getInTouch}
+            </Link>
             <div className="hidden items-center text-xs tracking-wide text-muted-foreground md:flex">
               {localeOptions.map(({ locale, label }, index) => {
                 const isActive = activeLocale === locale;
@@ -216,12 +225,6 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
                 );
               })}
             </div>
-            <Link
-              href={withLocale("/contact")}
-              className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
-            >
-              {dictionary.nav.getInTouch}
-            </Link>
 
             {/* Hamburger — mobile only */}
             <button
