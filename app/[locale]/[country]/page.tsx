@@ -1,5 +1,5 @@
 import { getDictionary } from "@/i18n/dictionaries";
-import { isValidLocale } from "@/i18n/config";
+import { parseLocale } from "@/i18n/config";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -11,8 +11,9 @@ export default async function CountryPage({
   params: Promise<{ locale: string; country: string }>;
 }) {
   const { locale, country } = await params;
+  const normalizedLocale = parseLocale(locale);
 
-  if (!isValidLocale(locale)) {
+  if (!normalizedLocale) {
     notFound();
   }
 
@@ -21,7 +22,7 @@ export default async function CountryPage({
     notFound();
   }
 
-  const dictionary = getDictionary(locale);
+  const dictionary = getDictionary(normalizedLocale);
 
   return (
     <main className="min-h-screen bg-background px-6 py-24">
@@ -30,7 +31,7 @@ export default async function CountryPage({
           Locale + Country Route
         </h1>
         <p className="mt-4 text-muted-foreground">
-          Active locale: <span className="font-medium text-foreground">{locale}</span>
+          Active locale: <span className="font-medium text-foreground">{normalizedLocale}</span>
         </p>
         <p className="mt-2 text-muted-foreground">
           Active country: <span className="font-medium text-foreground">{normalizedCountry.toUpperCase()}</span>
@@ -39,7 +40,7 @@ export default async function CountryPage({
           {dictionary.vietnamesePlaceholder}
         </p>
         <Link
-          href={`/${locale}`}
+          href={`/${normalizedLocale}`}
           className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-foreground px-6 text-sm font-medium text-background transition-opacity hover:opacity-90"
         >
           Back to localized homepage
