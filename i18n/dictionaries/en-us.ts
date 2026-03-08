@@ -69,6 +69,40 @@ export interface TranslationDictionary {
     ctaBody: string;
     ctaButton: string;
   };
+  services: {
+    heroTitle: string;
+    heroBody: string;
+    plans: Array<{
+      id: string;
+      title: string;
+      subtitle: string;
+      description: string;
+      features: string[];
+    }>;
+    getStarted: string;
+    processTitle: string;
+    processBody: string;
+    processSteps: Array<{
+      number: string;
+      title: string;
+      description: string;
+    }>;
+    includedTitle: string;
+    includedBody: string;
+    discussProject: string;
+    includedItems: Array<{
+      title: string;
+      description: string;
+    }>;
+    faqTitle: string;
+    faqs: Array<{
+      question: string;
+      answer: string;
+    }>;
+    ctaTitle: string;
+    ctaBody: string;
+    ctaButton: string;
+  };
 }
 
 export const enUS: TranslationDictionary = {
@@ -144,6 +178,134 @@ export const enUS: TranslationDictionary = {
     techTitle: "Technologies we love",
     ctaTitle: "Ready to start a project?",
     ctaBody: "Let's create something amazing together.",
+    ctaButton: "Get in touch",
+  },
+  services: {
+    heroTitle: "Services",
+    heroBody:
+      "Whether you're starting from scratch, reimagining your existing presence, or need ongoing support, we have a solution tailored for you.",
+    plans: [
+      {
+        id: "kickstart",
+        title: "Kickstart",
+        subtitle: "Start Fresh",
+        description:
+          "Launch your digital presence with a brand new website tailored to your unique vision and business goals.",
+        features: [
+          "Brand Discovery Session",
+          "Custom Design Concepts",
+          "Responsive Development",
+          "Content Strategy",
+          "SEO Foundation",
+          "Launch Support",
+          "30-Day Post-Launch Care",
+        ],
+      },
+      {
+        id: "revamp",
+        title: "Revamp",
+        subtitle: "Transform & Elevate",
+        description:
+          "Breathe new life into your existing website with a complete redesign that modernizes your digital presence.",
+        features: [
+          "Site Audit & Analysis",
+          "UX Improvements",
+          "Modern Redesign",
+          "Performance Optimization",
+          "Content Migration",
+          "SEO Enhancement",
+          "Analytics Setup",
+        ],
+      },
+      {
+        id: "sustain",
+        title: "Sustain",
+        subtitle: "Ongoing Partnership",
+        description:
+          "Keep your website running smoothly with reliable hosting, maintenance, and continuous support.",
+        features: [
+          "Managed Hosting",
+          "Security Monitoring",
+          "Regular Backups",
+          "Performance Updates",
+          "Content Updates",
+          "Priority Support",
+          "Monthly Reports",
+        ],
+      },
+    ],
+    getStarted: "Get started",
+    processTitle: "Our Process",
+    processBody: "A proven methodology that ensures every project is delivered with excellence and attention to detail.",
+    processSteps: [
+      {
+        number: "01",
+        title: "Discovery",
+        description: "We start by understanding your business, goals, and vision through in-depth conversations.",
+      },
+      {
+        number: "02",
+        title: "Strategy",
+        description: "We develop a comprehensive plan that aligns your digital presence with your business objectives.",
+      },
+      {
+        number: "03",
+        title: "Design",
+        description: "Our designers craft beautiful, user-centered interfaces that reflect your brand identity.",
+      },
+      {
+        number: "04",
+        title: "Development",
+        description: "We build your website with clean code, ensuring speed, security, and scalability.",
+      },
+      {
+        number: "05",
+        title: "Launch",
+        description: "After thorough testing, we deploy your site and provide training for your team.",
+      },
+      {
+        number: "06",
+        title: "Support",
+        description: "We continue to support you with maintenance, updates, and strategic guidance.",
+      },
+    ],
+    includedTitle: "Every project includes",
+    includedBody:
+      "Regardless of which service you choose, every project comes with our commitment to quality and your success.",
+    discussProject: "Discuss your project",
+    includedItems: [
+      { title: "Mobile-First Design", description: "Optimized for all devices and screen sizes" },
+      { title: "Performance Focus", description: "Fast loading times and smooth interactions" },
+      { title: "SEO Ready", description: "Built with search engine visibility in mind" },
+      { title: "Accessibility", description: "WCAG compliant for inclusive experiences" },
+      { title: "Secure & Scalable", description: "Enterprise-grade security and infrastructure" },
+      { title: "Documentation", description: "Complete guides for managing your site" },
+    ],
+    faqTitle: "Frequently Asked Questions",
+    faqs: [
+      {
+        question: "How long does a typical project take?",
+        answer:
+          "Project timelines vary based on scope and complexity. A Kickstart project typically takes 6-10 weeks, while a Revamp can be completed in 4-8 weeks.",
+      },
+      {
+        question: "What platforms do you work with?",
+        answer:
+          "We specialize in modern web technologies including Next.js, React, and headless CMS solutions. We can also work with platforms like Shopify and WordPress.",
+      },
+      {
+        question: "Do you offer payment plans?",
+        answer:
+          "Yes, we offer flexible payment options including milestone-based payments and monthly installments for larger projects.",
+      },
+      {
+        question: "What's included in the Sustain plan?",
+        answer:
+          "The Sustain plan includes managed hosting, regular backups, security monitoring, performance updates, content updates, and priority support.",
+      },
+    ],
+    ctaTitle: "Ready to get started?",
+    ctaBody: "Let's discuss your project and find the perfect solution for your needs.",
     ctaButton: "Get in touch",
   },
 };

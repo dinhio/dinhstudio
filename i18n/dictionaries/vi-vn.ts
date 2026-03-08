@@ -74,4 +74,128 @@ export const viVN = {
     ctaBody: "Hãy cùng nhau tạo nên điều tuyệt vời.",
     ctaButton: "Liên hệ ngay",
   },
+  services: {
+    heroTitle: "Dịch vụ",
+    heroBody:
+      "Dù bạn bắt đầu từ con số 0, làm mới website hiện tại, hay cần hỗ trợ dài hạn, chúng tôi đều có giải pháp phù hợp.",
+    plans: [
+      {
+        id: "kickstart",
+        title: "Khởi động",
+        subtitle: "Bắt đầu mới",
+        description: "Xây dựng hiện diện số với website mới, được thiết kế riêng theo tầm nhìn và mục tiêu kinh doanh của bạn.",
+        features: [
+          "Buổi khám phá thương hiệu",
+          "Ý tưởng thiết kế tùy chỉnh",
+          "Phát triển responsive",
+          "Chiến lược nội dung",
+          "Nền tảng SEO cơ bản",
+          "Hỗ trợ khi ra mắt",
+          "Chăm sóc 30 ngày sau ra mắt",
+        ],
+      },
+      {
+        id: "revamp",
+        title: "Làm mới",
+        subtitle: "Nâng cấp toàn diện",
+        description: "Thổi làn gió mới vào website hiện tại với bản thiết kế lại hiện đại và hiệu quả hơn.",
+        features: [
+          "Đánh giá và phân tích website",
+          "Cải thiện UX",
+          "Thiết kế lại hiện đại",
+          "Tối ưu hiệu năng",
+          "Chuyển đổi nội dung",
+          "Nâng cấp SEO",
+          "Thiết lập phân tích dữ liệu",
+        ],
+      },
+      {
+        id: "sustain",
+        title: "Duy trì",
+        subtitle: "Đồng hành dài hạn",
+        description: "Giữ website hoạt động ổn định với dịch vụ hosting, bảo trì và hỗ trợ liên tục.",
+        features: [
+          "Hosting được quản lý",
+          "Giám sát bảo mật",
+          "Sao lưu định kỳ",
+          "Cập nhật hiệu năng",
+          "Cập nhật nội dung",
+          "Hỗ trợ ưu tiên",
+          "Báo cáo hàng tháng",
+        ],
+      },
+    ],
+    getStarted: "Bắt đầu ngay",
+    processTitle: "Quy trình của chúng tôi",
+    processBody: "Phương pháp đã được kiểm chứng để mỗi dự án đều đạt chất lượng cao và chú trọng từng chi tiết.",
+    processSteps: [
+      {
+        number: "01",
+        title: "Khám phá",
+        description: "Chúng tôi bắt đầu bằng việc hiểu doanh nghiệp, mục tiêu và tầm nhìn của bạn qua trao đổi chuyên sâu.",
+      },
+      {
+        number: "02",
+        title: "Chiến lược",
+        description: "Chúng tôi xây dựng kế hoạch toàn diện để hiện diện số của bạn bám sát mục tiêu kinh doanh.",
+      },
+      {
+        number: "03",
+        title: "Thiết kế",
+        description: "Đội ngũ thiết kế tạo giao diện đẹp mắt, lấy người dùng làm trung tâm và phản ánh đúng thương hiệu.",
+      },
+      {
+        number: "04",
+        title: "Phát triển",
+        description: "Chúng tôi phát triển website với mã nguồn sạch, đảm bảo tốc độ, bảo mật và khả năng mở rộng.",
+      },
+      {
+        number: "05",
+        title: "Ra mắt",
+        description: "Sau khi kiểm thử kỹ lưỡng, chúng tôi triển khai website và hướng dẫn đội ngũ của bạn sử dụng.",
+      },
+      {
+        number: "06",
+        title: "Hỗ trợ",
+        description: "Chúng tôi tiếp tục đồng hành qua bảo trì, cập nhật và tư vấn chiến lược.",
+      },
+    ],
+    includedTitle: "Mỗi dự án đều bao gồm",
+    includedBody: "Dù bạn chọn gói dịch vụ nào, mỗi dự án đều đi kèm cam kết về chất lượng và thành công của bạn.",
+    discussProject: "Trao đổi dự án",
+    includedItems: [
+      { title: "Thiết kế ưu tiên di động", description: "Tối ưu cho mọi thiết bị và kích thước màn hình" },
+      { title: "Tập trung hiệu năng", description: "Tốc độ tải nhanh và tương tác mượt mà" },
+      { title: "Sẵn sàng SEO", description: "Xây dựng với định hướng tăng khả năng hiển thị trên công cụ tìm kiếm" },
+      { title: "Khả năng truy cập", description: "Tuân thủ WCAG để đảm bảo trải nghiệm toàn diện" },
+      { title: "Bảo mật và mở rộng", description: "Hạ tầng và bảo mật đạt tiêu chuẩn cao" },
+      { title: "Tài liệu đầy đủ", description: "Hướng dẫn chi tiết để bạn quản lý website dễ dàng" },
+    ],
+    faqTitle: "Câu hỏi thường gặp",
+    faqs: [
+      {
+        question: "Một dự án thường mất bao lâu?",
+        answer:
+          "Thời gian thực hiện phụ thuộc vào phạm vi và độ phức tạp. Gói Khởi động thường mất 6-10 tuần, còn gói Làm mới thường từ 4-8 tuần.",
+      },
+      {
+        question: "Bạn làm việc với những nền tảng nào?",
+        answer:
+          "Chúng tôi chuyên về công nghệ web hiện đại như Next.js, React và các giải pháp CMS headless. Chúng tôi cũng có thể triển khai trên Shopify và WordPress.",
+      },
+      {
+        question: "Có hỗ trợ kế hoạch thanh toán không?",
+        answer:
+          "Có. Chúng tôi cung cấp các lựa chọn thanh toán linh hoạt như theo từng mốc dự án hoặc trả góp theo tháng cho dự án lớn.",
+      },
+      {
+        question: "Gói Duy trì bao gồm những gì?",
+        answer:
+          "Gói Duy trì bao gồm hosting quản lý, sao lưu định kỳ, giám sát bảo mật, cập nhật hiệu năng, cập nhật nội dung và hỗ trợ ưu tiên.",
+      },
+    ],
+    ctaTitle: "Sẵn sàng bắt đầu?",
+    ctaBody: "Hãy trao đổi về dự án của bạn để tìm ra giải pháp phù hợp nhất.",
+    ctaButton: "Liên hệ ngay",
+  },
 } as const satisfies TranslationDictionary;
