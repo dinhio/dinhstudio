@@ -25,6 +25,17 @@ test("keyboard navigation works in both directions", async ({ page }) => {
     .toBe(initial);
 });
 
+test("auto-advances to the next slide after 5 seconds", async ({ page }) => {
+  const initial = await currentTitle(page);
+
+  await page.waitForTimeout(4800);
+  await expect(await currentTitle(page)).toBe(initial);
+
+  await expect
+    .poll(() => currentTitle(page), { timeout: 1500 })
+    .not.toBe(initial);
+});
+
 test("swipe parity matches arrow button behavior", async ({ page }) => {
   const track = page.getByTestId("carousel-track");
   const next = page.getByRole("button", { name: "Next project" });
