@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "i18n:check": "node scripts/check-i18n-sync.mjs",
     "bench:carousel": "node scripts/benchmark-carousel.mjs",
     "bench:carousel:network": "node scripts/benchmark-carousel-network.mjs",
     "bench:carousel:mainthread": "node scripts/benchmark-carousel-mainthread.mjs",
