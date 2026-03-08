@@ -11,14 +11,81 @@ interface CarouselItem {
   title: string;
   image: string;
   link: string;
+  textTheme: {
+    primary: string;
+    secondary: string;
+    glow: string;
+    ctaBackground: string;
+    ctaBorder: string;
+  };
 }
 
 const carouselItems: CarouselItem[] = [
-  { id: 1, title: "Artisan Bloom", image: "/carousel/project-1.jpg", link: "/work/artisan-bloom" },
-  { id: 2, title: "Neotech Labs", image: "/carousel/project-2.jpg", link: "/work/neotech-labs" },
-  { id: 3, title: "Verdant Co", image: "/carousel/project-3.jpg", link: "/work/verdant-co" },
-  { id: 4, title: "Lumina Studio", image: "/carousel/project-4.jpg", link: "/work/lumina-studio" },
-  { id: 5, title: "Aurora Digital", image: "/carousel/project-5.jpg", link: "/work/aurora-digital" },
+  {
+    id: 1,
+    title: "Artisan Bloom",
+    image: "/carousel/project-1.jpg",
+    link: "/work/artisan-bloom",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.7)",
+      glow: "0 0 24px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.75)",
+      ctaBackground: "rgba(255,255,255,0.14)",
+      ctaBorder: "rgba(255,255,255,0.38)",
+    },
+  },
+  {
+    id: 2,
+    title: "Neotech Labs",
+    image: "/carousel/project-2.jpg",
+    link: "/work/neotech-labs",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.65)",
+      glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
+      ctaBackground: "rgba(255,255,255,0.12)",
+      ctaBorder: "rgba(255,255,255,0.35)",
+    },
+  },
+  {
+    id: 3,
+    title: "Verdant Co",
+    image: "/carousel/project-3.jpg",
+    link: "/work/verdant-co",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.68)",
+      glow: "0 0 22px rgba(0,0,0,0.82), 0 2px 8px rgba(0,0,0,0.72)",
+      ctaBackground: "rgba(255,255,255,0.11)",
+      ctaBorder: "rgba(255,255,255,0.33)",
+    },
+  },
+  {
+    id: 4,
+    title: "Lumina Studio",
+    image: "/carousel/project-4.jpg",
+    link: "/work/lumina-studio",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.62)",
+      glow: "0 0 26px rgba(0,0,0,0.88), 0 2px 8px rgba(0,0,0,0.82)",
+      ctaBackground: "rgba(255,255,255,0.13)",
+      ctaBorder: "rgba(255,255,255,0.37)",
+    },
+  },
+  {
+    id: 5,
+    title: "Aurora Digital",
+    image: "/carousel/project-5.jpg",
+    link: "/work/aurora-digital",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.7)",
+      glow: "0 0 24px rgba(0,0,0,0.86), 0 2px 8px rgba(0,0,0,0.78)",
+      ctaBackground: "rgba(255,255,255,0.14)",
+      ctaBorder: "rgba(255,255,255,0.4)",
+    },
+  },
 ];
 
 const TOTAL = carouselItems.length;
@@ -221,11 +288,7 @@ export function HeroCarousel() {
   }, [activeIndex]);
 
   const activeItem = carouselItems[activeIndex];
-  const activeColor = {
-    primary: "#ffffff",
-    secondary: "rgba(255,255,255,0.65)",
-    glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
-  };
+  const activeColor = activeItem.textTheme;
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
@@ -339,8 +402,8 @@ export function HeroCarousel() {
             style={{
               transition:
                 "color 500ms ease, background-color 500ms ease, border-color 500ms ease, box-shadow 500ms ease, transform 200ms ease",
-              backgroundColor: "rgba(255,255,255,0.12)",
-              borderColor: "rgba(255,255,255,0.35)",
+              backgroundColor: activeColor.ctaBackground,
+              borderColor: activeColor.ctaBorder,
               color: activeColor.primary,
               boxShadow: activeColor.glow,
             }}
