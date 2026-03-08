@@ -10,19 +10,22 @@ const COUNTRY_TO_LOCALE: Record<string, AppLocale> = {
 };
 
 export function isValidLocale(locale: string): locale is AppLocale {
-  return SUPPORTED_LOCALES.includes(locale.toLowerCase() as AppLocale);
+  return SUPPORTED_LOCALES.includes(locale as AppLocale);
 }
 
 export function normalizeLocale(locale: string): string {
   return locale.toLowerCase();
 }
 
+export function parseLocale(locale?: string | null): AppLocale | null {
+  if (!locale) return null;
+  const normalized = normalizeLocale(locale);
+  return isValidLocale(normalized) ? normalized : null;
+}
+
 export function getLocaleFromPathname(pathname: string): AppLocale | null {
   const segment = pathname.split("/").filter(Boolean)[0];
-  if (!segment) return null;
-
-  const normalized = normalizeLocale(segment);
-  return isValidLocale(normalized) ? normalized : null;
+  return parseLocale(segment);
 }
 
 export function getLocaleFromCountry(countryHeader?: string | null): AppLocale | null {
@@ -55,8 +58,8 @@ export function resolveLocale(options: {
   const fromPath = getLocaleFromPathname(options.pathname);
   if (fromPath) return fromPath;
 
-  const cookieLocale = options.cookieLocale ? normalizeLocale(options.cookieLocale) : null;
-  if (cookieLocale && isValidLocale(cookieLocale)) return cookieLocale;
+  const cookieLocale = parseLocale(options.cookieLocale);
+  if (cookieLocale) return cookieLocale;
 
   const fromCountry = getLocaleFromCountry(options.country);
   if (fromCountry) return fromCountry;
