@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dinhstudio Website
 
-## Getting Started
+Marketing site for Dinhstudio, built with Next.js App Router, TypeScript, Tailwind CSS v4, and Framer Motion.
 
-First, run the development server:
+## Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript (strict)
+- Tailwind CSS v4
+- Framer Motion
+
+## Local Development
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The root route redirects to the default locale (`/en-us`).
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/
+  [locale]/            Localized pages (home, work, services, about, contact)
+  [locale]/[country]/  Country-aware landing route
+  layout.tsx           Global shell
+components/
+  hero-carousel.tsx    Homepage hero carousel
+  navbar.tsx           Responsive nav with locale switching
+i18n/
+  config.ts            Locale resolution and helpers
+  dictionaries/        Translation dictionaries (en-us, vi-vn)
+public/
+  carousel/            Carousel image assets
+scripts/
+  check-i18n-sync.mjs  Translation key sync check
+tests/
+  carousel.spec.ts     Playwright carousel e2e
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Localization
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Supported locales: `en-us`, `vi-vn`
+- Default locale: `en-us`
+- Locale resolution utilities live in `i18n/config.ts`
+- Page copy is managed through typed dictionaries in `i18n/dictionaries/`
 
-## Deploy on Vercel
+## Commands
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev`: Start local development server
+- `npm run build`: Create production build
+- `npm run start`: Run production build
+- `npm run lint`: Run ESLint checks
+- `npm run i18n:check`: Verify dictionary key sync
+- `npm run bench:carousel`: Run carousel benchmark script
+- `npm run bench:carousel:network`: Benchmark carousel network behavior
+- `npm run bench:carousel:mainthread`: Benchmark main-thread carousel cost
+- `npm run test:e2e:carousel`: Run Playwright carousel e2e (Chromium)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Validation
+
+Use these before opening a PR:
+
+```bash
+npm run lint
+npm run build
+```
