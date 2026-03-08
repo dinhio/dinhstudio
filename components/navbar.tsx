@@ -246,7 +246,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         role="dialog"
         aria-modal="true"
         aria-label={dictionary.nav.navigationMenu}
-        className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
+        className="fixed inset-0 z-[79] flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
           pointerEvents: mobileOpen ? "auto" : "none",
