@@ -232,7 +232,7 @@ export default async function AboutPage({
             >
               EN
             </Link>
-            <span className="px-1 text-border">/</span>
+            <span className="px-1 text-muted-foreground/70">/</span>
             <Link
               href="/vi-vn/about"
               className={`px-0.5 transition-colors ${normalizedLocale === "vi-vn"

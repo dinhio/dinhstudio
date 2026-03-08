@@ -219,7 +219,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
                       {label}
                     </Link>
                     {index < localeOptions.length - 1 ? (
-                      <span className="px-1 text-border">/</span>
+                      <span className="px-1 text-muted-foreground/70">/</span>
                     ) : null}
                   </span>
                 );
@@ -293,7 +293,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
                     {label}
                   </Link>
                   {index < localeOptions.length - 1 ? (
-                    <span className="px-1 text-border">/</span>
+                    <span className="px-1 text-muted-foreground/70">/</span>
                   ) : null}
                 </span>
               );

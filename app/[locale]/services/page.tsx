@@ -225,7 +225,7 @@ export default async function ServicesPage({
             >
               EN
             </Link>
-            <span className="px-1 text-border">/</span>
+            <span className="px-1 text-muted-foreground/70">/</span>
             <Link
               href="/vi-vn/services"
               className={`px-0.5 transition-colors ${normalizedLocale === "vi-vn"

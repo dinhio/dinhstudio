@@ -185,7 +185,7 @@ export default async function Home({
             >
               EN
             </Link>
-            <span className="px-1 text-border">/</span>
+            <span className="px-1 text-muted-foreground/70">/</span>
             <Link
               href="/vi-vn"
               className={`px-0.5 transition-colors ${normalizedLocale === "vi-vn"
