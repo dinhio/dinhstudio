@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu, X } from "lucide-react";
 
 interface NavbarProps {
   alwaysVisible?: boolean;
+  hideUntilScroll?: boolean;
 }
 
 const navLinks = [
@@ -14,27 +15,108 @@ const navLinks = [
   { href: "/about", label: "About" },
 ];
 
-export function Navbar({ alwaysVisible = false }: NavbarProps) {
-  const [bgOpacity, setBgOpacity] = useState(alwaysVisible ? 1 : 0);
+// Threshold for scroll reveal (viewport height)
+const SCROLL_THRESHOLD_VH = 0.85;
+// Mouse proximity zone at top of viewport (in pixels)
+const MOUSE_PROXIMITY_ZONE = 80;
+
+export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
+  const [bgOpacity, setBgOpacity] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Track if mouse is near top of viewport
+  const [isMouseNearTop, setIsMouseNearTop] = useState(false);
+  // Track if user has scrolled past threshold
+  const [hasScrolledPast, setHasScrolledPast] = useState(false);
+  // Ref to track hiding timeout
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (alwaysVisible) {
-      setBgOpacity(1);
-      return;
+  // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
+  const shouldShowDesktopNavbar =
+    alwaysVisible || !hideUntilScroll || hasScrolledPast || isMouseNearTop;
+
+  // Handle mouse proximity to top
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (alwaysVisible || !hideUntilScroll) return;
+    
+    const isNearTop = e.clientY <= MOUSE_PROXIMITY_ZONE;
+    
+    if (isNearTop) {
+      // Clear any pending hide timeout
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+      setIsMouseNearTop(true);
+    } else if (!hasScrolledPast) {
+      // Delay hiding the navbar when mouse leaves the zone
+      if (!hideTimeoutRef.current) {
+        hideTimeoutRef.current = setTimeout(() => {
+          setIsMouseNearTop(false);
+          hideTimeoutRef.current = null;
+        }, 400);
+      }
     }
+  }, [alwaysVisible, hideUntilScroll, hasScrolledPast]);
 
+  // Handle scroll behavior
+  useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      // Fade background in over the first 120px of scroll
+      const threshold = window.innerHeight * SCROLL_THRESHOLD_VH;
+      
+      // Check if scrolled past threshold
+      if (hideUntilScroll) {
+        if (scrollY > threshold) {
+          setHasScrolledPast(true);
+        } else if (scrollY < 50) {
+          // Reset when scrolled back to top
+          setHasScrolledPast(false);
+        }
+      }
+      
+      // Fade background in over the first 120px of scroll (when visible)
       const opacity = Math.min(scrollY / 120, 1);
       setBgOpacity(opacity);
+      
       if (mobileOpen && scrollY > 10) setMobileOpen(false);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [alwaysVisible, mobileOpen]);
+  }, [alwaysVisible, hideUntilScroll, mobileOpen, isMouseNearTop]);
+
+  const backgroundOpacity =
+    alwaysVisible
+      ? 0.92
+      : hideUntilScroll && !alwaysVisible
+        ? (shouldShowDesktopNavbar ? (isMouseNearTop && !hasScrolledPast ? 1 : bgOpacity * 0.92) : 0)
+        : bgOpacity * 0.92;
+
+  // Handle mouse move for proximity detection
+  useEffect(() => {
+    if (!hideUntilScroll || alwaysVisible) return;
+    
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, [hideUntilScroll, alwaysVisible, handleMouseMove]);
+
+  // Listen for explore button click
+  useEffect(() => {
+    if (!hideUntilScroll || alwaysVisible) return;
+
+    const handleExploreClick = () => {
+      setHasScrolledPast(true);
+    };
+
+    // Listen for custom event dispatched when explore is clicked
+    window.addEventListener("navbar-reveal", handleExploreClick);
+    return () => window.removeEventListener("navbar-reveal", handleExploreClick);
+  }, [hideUntilScroll, alwaysVisible]);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -49,18 +131,23 @@ export function Navbar({ alwaysVisible = false }: NavbarProps) {
         One element for all screen sizes. Background fades in on scroll.
         Desktop shows centre links; mobile hides them behind hamburger.
       */}
-      <header className="fixed top-0 left-0 right-0 z-50">
+      <header className="fixed top-0 left-0 right-0 z-[80]">
         {/* Fading background layer — separate so content opacity is unaffected */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
           style={{
             backgroundColor: "var(--background)",
-            opacity: bgOpacity * 0.92,
+            opacity: backgroundOpacity,
           }}
         />
 
-        <div className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+        <div
+          className={`relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4 transition-transform duration-300 md:transition-opacity ${shouldShowDesktopNavbar
+            ? "md:translate-y-0 md:opacity-100 md:pointer-events-auto"
+            : "md:-translate-y-full md:opacity-0 md:pointer-events-none"
+            }`}
+        >
           {/* Logo */}
           <Link
             href="/"

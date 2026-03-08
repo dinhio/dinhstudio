@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
-      <Navbar />
+      <Navbar hideUntilScroll />
       
       {/* Hero Section with 3D Carousel */}
       <HeroCarousel />
