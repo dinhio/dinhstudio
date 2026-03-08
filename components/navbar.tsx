@@ -194,21 +194,25 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
           {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
           <div className="flex items-center gap-3">
-            <div className="hidden items-center rounded-full border border-border/80 bg-card/60 p-1 backdrop-blur md:flex">
-              {localeOptions.map(({ locale, label }) => {
+            <div className="hidden items-center text-xs tracking-wide text-muted-foreground md:flex">
+              {localeOptions.map(({ locale, label }, index) => {
                 const isActive = activeLocale === locale;
                 return (
-                  <Link
-                    key={locale}
-                    href={switchLocaleHref(locale)}
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition-colors ${isActive
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    aria-current={isActive ? "page" : undefined}
-                  >
-                    {label}
-                  </Link>
+                  <span key={locale} className="flex items-center">
+                    <Link
+                      href={switchLocaleHref(locale)}
+                      className={`px-0.5 transition-all ${isActive
+                        ? "font-bold text-foreground"
+                        : "font-medium hover:text-foreground hover:opacity-85"
+                        }`}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      {label}
+                    </Link>
+                    {index < localeOptions.length - 1 ? (
+                      <span className="px-1 text-border">/</span>
+                    ) : null}
+                  </span>
                 );
               })}
             </div>
@@ -270,21 +274,25 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
         {/* Bottom CTA */}
         <div className="px-8 pb-12">
-          <div className="mb-4 flex items-center justify-center gap-2">
-            {localeOptions.map(({ locale, label }) => {
+          <div className="mb-4 flex items-center justify-center text-xs tracking-wide text-muted-foreground">
+            {localeOptions.map(({ locale, label }, index) => {
               const isActive = activeLocale === locale;
               return (
-                <Link
-                  key={locale}
-                  href={switchLocaleHref(locale)}
-                  onClick={() => setMobileOpen(false)}
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${isActive
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border text-muted-foreground"
-                    }`}
-                >
-                  {label}
-                </Link>
+                <span key={locale} className="flex items-center">
+                  <Link
+                    href={switchLocaleHref(locale)}
+                    onClick={() => setMobileOpen(false)}
+                    className={`px-0.5 transition-colors ${isActive
+                      ? "font-bold text-foreground"
+                      : "font-medium hover:text-foreground"
+                      }`}
+                  >
+                    {label}
+                  </Link>
+                  {index < localeOptions.length - 1 ? (
+                    <span className="px-1 text-border">/</span>
+                  ) : null}
+                </span>
               );
             })}
           </div>
