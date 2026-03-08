@@ -103,6 +103,29 @@ export interface TranslationDictionary {
     ctaBody: string;
     ctaButton: string;
   };
+  work: {
+    heroTitle: string;
+    heroBody: string;
+    featuredLabel: string;
+    viewProject: string;
+    ctaTitle: string;
+    ctaBody: string;
+    ctaButton: string;
+    projects: Array<{
+      id: string;
+      title: string;
+      category: string;
+      description: string;
+      image: string;
+      testimonial: {
+        quote: string;
+        author: string;
+        role: string;
+      };
+      link: string;
+      featured?: boolean;
+    }>;
+  };
 }
 
 export const enUS: TranslationDictionary = {
@@ -307,5 +330,88 @@ export const enUS: TranslationDictionary = {
     ctaTitle: "Ready to get started?",
     ctaBody: "Let's discuss your project and find the perfect solution for your needs.",
     ctaButton: "Get in touch",
+  },
+  work: {
+    heroTitle: "Our Work",
+    heroBody:
+      "A selection of projects we've had the pleasure of working on. Each one represents a unique collaboration and a story worth telling.",
+    featuredLabel: "Featured Project",
+    viewProject: "View Project",
+    ctaTitle: "Want to be our next success story?",
+    ctaBody: "Let's create something amazing together.",
+    ctaButton: "Start your project",
+    projects: [
+      {
+        id: "neotech-labs",
+        title: "Neotech Labs",
+        category: "Tech Startup",
+        description: "A complete brand identity and website redesign for a cutting-edge AI research company.",
+        image: "/carousel/project-2.jpg",
+        testimonial: {
+          quote:
+            "dinhstudio transformed our digital presence completely. The new website perfectly captures our innovative spirit and has significantly improved our conversion rates.",
+          author: "Sarah Chen",
+          role: "CEO, Neotech Labs",
+        },
+        link: "/work/neotech-labs",
+        featured: true,
+      },
+      {
+        id: "artisan-bloom",
+        title: "Artisan Bloom",
+        category: "E-commerce",
+        description: "An elegant e-commerce platform for a boutique floral design studio.",
+        image: "/carousel/project-1.jpg",
+        testimonial: {
+          quote:
+            "Working with dinhstudio was a dream. They understood our aesthetic perfectly and delivered a website that our customers love.",
+          author: "Emma Richards",
+          role: "Founder, Artisan Bloom",
+        },
+        link: "/work/artisan-bloom",
+      },
+      {
+        id: "verdant-co",
+        title: "Verdant Co",
+        category: "Sustainability",
+        description: "A mission-driven website for an environmental consulting firm.",
+        image: "/carousel/project-3.jpg",
+        testimonial: {
+          quote:
+            "The team at dinhstudio created a website that truly reflects our commitment to sustainability. The design is both beautiful and functional.",
+          author: "Michael Torres",
+          role: "Director, Verdant Co",
+        },
+        link: "/work/verdant-co",
+      },
+      {
+        id: "lumina-studio",
+        title: "Lumina Studio",
+        category: "Photography",
+        description: "A stunning portfolio website for an award-winning photography studio.",
+        image: "/carousel/project-4.jpg",
+        testimonial: {
+          quote:
+            "As visual artists ourselves, we had high expectations. dinhstudio exceeded them all with a portfolio site that showcases our work beautifully.",
+          author: "David Park",
+          role: "Creative Director, Lumina Studio",
+        },
+        link: "/work/lumina-studio",
+      },
+      {
+        id: "aurora-digital",
+        title: "Aurora Digital",
+        category: "Digital Agency",
+        description: "A bold, modern website for a digital marketing agency.",
+        image: "/carousel/project-5.jpg",
+        testimonial: {
+          quote:
+            "dinhstudio delivered a website that positions us as industry leaders. The design language is exactly what we envisioned.",
+          author: "Jessica Williams",
+          role: "Partner, Aurora Digital",
+        },
+        link: "/work/aurora-digital",
+      },
+    ],
   },
 };

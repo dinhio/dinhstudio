@@ -198,4 +198,86 @@ export const viVN = {
     ctaBody: "Hãy trao đổi về dự án của bạn để tìm ra giải pháp phù hợp nhất.",
     ctaButton: "Liên hệ ngay",
   },
+  work: {
+    heroTitle: "Dự án tiêu biểu",
+    heroBody: "Một số dự án chúng tôi đã có cơ hội đồng hành. Mỗi dự án là một sự hợp tác riêng và một câu chuyện đáng nhớ.",
+    featuredLabel: "Dự án nổi bật",
+    viewProject: "Xem dự án",
+    ctaTitle: "Bạn muốn trở thành câu chuyện thành công tiếp theo?",
+    ctaBody: "Hãy cùng nhau tạo nên điều tuyệt vời.",
+    ctaButton: "Bắt đầu dự án",
+    projects: [
+      {
+        id: "neotech-labs",
+        title: "Neotech Labs",
+        category: "Startup công nghệ",
+        description: "Xây dựng lại toàn bộ nhận diện thương hiệu và website cho một công ty nghiên cứu AI tiên phong.",
+        image: "/carousel/project-2.jpg",
+        testimonial: {
+          quote:
+            "dinhstudio đã thay đổi hoàn toàn hiện diện số của chúng tôi. Website mới thể hiện đúng tinh thần đổi mới và cải thiện đáng kể tỉ lệ chuyển đổi.",
+          author: "Sarah Chen",
+          role: "CEO, Neotech Labs",
+        },
+        link: "/work/neotech-labs",
+        featured: true,
+      },
+      {
+        id: "artisan-bloom",
+        title: "Artisan Bloom",
+        category: "Thương mại điện tử",
+        description: "Nền tảng thương mại điện tử tinh tế cho một studio thiết kế hoa cao cấp.",
+        image: "/carousel/project-1.jpg",
+        testimonial: {
+          quote:
+            "Làm việc cùng dinhstudio là một trải nghiệm tuyệt vời. Họ hiểu đúng thẩm mỹ của chúng tôi và tạo ra website được khách hàng yêu thích.",
+          author: "Emma Richards",
+          role: "Nhà sáng lập, Artisan Bloom",
+        },
+        link: "/work/artisan-bloom",
+      },
+      {
+        id: "verdant-co",
+        title: "Verdant Co",
+        category: "Phát triển bền vững",
+        description: "Website định hướng sứ mệnh cho một công ty tư vấn môi trường.",
+        image: "/carousel/project-3.jpg",
+        testimonial: {
+          quote:
+            "Đội ngũ dinhstudio đã tạo ra một website phản ánh rõ cam kết bền vững của chúng tôi. Thiết kế vừa đẹp vừa hiệu quả.",
+          author: "Michael Torres",
+          role: "Giám đốc, Verdant Co",
+        },
+        link: "/work/verdant-co",
+      },
+      {
+        id: "lumina-studio",
+        title: "Lumina Studio",
+        category: "Nhiếp ảnh",
+        description: "Website portfolio ấn tượng cho một studio nhiếp ảnh đạt nhiều giải thưởng.",
+        image: "/carousel/project-4.jpg",
+        testimonial: {
+          quote:
+            "Vì là người làm sáng tạo, chúng tôi đặt kỳ vọng rất cao. dinhstudio đã vượt mong đợi với website portfolio thể hiện tác phẩm rất đẹp.",
+          author: "David Park",
+          role: "Giám đốc sáng tạo, Lumina Studio",
+        },
+        link: "/work/lumina-studio",
+      },
+      {
+        id: "aurora-digital",
+        title: "Aurora Digital",
+        category: "Agency số",
+        description: "Website hiện đại, táo bạo cho một agency marketing digital.",
+        image: "/carousel/project-5.jpg",
+        testimonial: {
+          quote:
+            "dinhstudio mang đến một website giúp chúng tôi được định vị như đơn vị dẫn đầu. Ngôn ngữ thiết kế đúng như những gì chúng tôi hình dung.",
+          author: "Jessica Williams",
+          role: "Đồng sáng lập, Aurora Digital",
+        },
+        link: "/work/aurora-digital",
+      },
+    ],
+  },
 } as const satisfies TranslationDictionary;
