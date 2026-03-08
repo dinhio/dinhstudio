@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Syne, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const syne = Syne({
@@ -29,6 +30,7 @@ export default function RootLayout({
         className={`${syne.variable} ${geistMono.variable} font-sans antialiased`}
       >
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
