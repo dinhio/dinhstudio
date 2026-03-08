@@ -87,8 +87,8 @@ async function runBench() {
       attempts += 1;
       const active = await getActiveNormalizedTitle(page);
       if (active === firstTarget.title.replace(/\s+/g, "").toLowerCase()) {
-        const readyDelay = await waitForSlideReady(page, firstTarget.title, 3000);
-        firstNavMs = Date.now() - firstClickStart + readyDelay;
+        await waitForSlideReady(page, firstTarget.title, 3000);
+        firstNavMs = Date.now() - firstClickStart;
         break;
       }
       await page.waitForTimeout(200);
