@@ -158,10 +158,10 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         {/* Fading background layer — separate so content opacity is unaffected */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
+          className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${mobileOpen ? "backdrop-blur-xl" : "backdrop-blur-md"}`}
           style={{
-            backgroundColor: "var(--background)",
-            opacity: backgroundOpacity,
+            backgroundColor: mobileOpen ? "rgba(0, 0, 0, 0.92)" : "var(--background)",
+            opacity: mobileOpen ? 1 : backgroundOpacity,
           }}
         />
 
