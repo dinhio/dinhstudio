@@ -1,28 +1,9 @@
-import { spawn } from "node:child_process";
 import process from "node:process";
 import { chromium } from "playwright";
-
-const BASE_URL = "http://127.0.0.1:3000";
-
-async function waitForServer(url, timeoutMs = 60000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {
-      // retry
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error(`Timed out waiting for server: ${url}`);
-}
+import { BASE_URL, startProdServer, waitForServer, applyThrottle } from "./bench-utils.mjs";
 
 async function runBench() {
-  const server = spawn("npm", ["run", "start", "--", "--hostname", "127.0.0.1", "--port", "3000"], {
-    stdio: "pipe",
-    env: { ...process.env, NODE_ENV: "production" },
-  });
+  const server = startProdServer();
 
   let browser;
   try {
@@ -48,16 +29,7 @@ async function runBench() {
     });
 
     const client = await context.newCDPSession(page);
-    await client.send("Network.enable");
-    await client.send("Network.emulateNetworkConditions", {
-      offline: false,
-      latency: 120,
-      downloadThroughput: (1.6 * 1024 * 1024) / 8,
-      uploadThroughput: (750 * 1024) / 8,
-      connectionType: "cellular3g",
-    });
-    await client.send("Emulation.setCPUThrottlingRate", { rate: 4 });
-    await client.send("Network.setCacheDisabled", { cacheDisabled: true });
+    await applyThrottle(client);
 
     await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(3000);
