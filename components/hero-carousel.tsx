@@ -1,22 +1,91 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useReducer } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface CarouselItem {
   id: number;
   title: string;
   image: string;
   link: string;
+  textTheme: {
+    primary: string;
+    secondary: string;
+    glow: string;
+    ctaBackground: string;
+    ctaBorder: string;
+  };
 }
 
 const carouselItems: CarouselItem[] = [
-  { id: 1, title: "Artisan Bloom", image: "/carousel/project-1.jpg", link: "/work/artisan-bloom" },
-  { id: 2, title: "Neotech Labs", image: "/carousel/project-2.jpg", link: "/work/neotech-labs" },
-  { id: 3, title: "Verdant Co", image: "/carousel/project-3.jpg", link: "/work/verdant-co" },
-  { id: 4, title: "Lumina Studio", image: "/carousel/project-4.jpg", link: "/work/lumina-studio" },
-  { id: 5, title: "Aurora Digital", image: "/carousel/project-5.jpg", link: "/work/aurora-digital" },
+  {
+    id: 1,
+    title: "Artisan Bloom",
+    image: "/carousel/project-1.jpg",
+    link: "/work/artisan-bloom",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.7)",
+      glow: "0 0 24px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.75)",
+      ctaBackground: "rgba(255,255,255,0.14)",
+      ctaBorder: "rgba(255,255,255,0.38)",
+    },
+  },
+  {
+    id: 2,
+    title: "Neotech Labs",
+    image: "/carousel/project-2.jpg",
+    link: "/work/neotech-labs",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.65)",
+      glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
+      ctaBackground: "rgba(255,255,255,0.12)",
+      ctaBorder: "rgba(255,255,255,0.35)",
+    },
+  },
+  {
+    id: 3,
+    title: "Verdant Co",
+    image: "/carousel/project-3.jpg",
+    link: "/work/verdant-co",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.68)",
+      glow: "0 0 22px rgba(0,0,0,0.82), 0 2px 8px rgba(0,0,0,0.72)",
+      ctaBackground: "rgba(255,255,255,0.11)",
+      ctaBorder: "rgba(255,255,255,0.33)",
+    },
+  },
+  {
+    id: 4,
+    title: "Lumina Studio",
+    image: "/carousel/project-4.jpg",
+    link: "/work/lumina-studio",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.62)",
+      glow: "0 0 26px rgba(0,0,0,0.88), 0 2px 8px rgba(0,0,0,0.82)",
+      ctaBackground: "rgba(255,255,255,0.13)",
+      ctaBorder: "rgba(255,255,255,0.37)",
+    },
+  },
+  {
+    id: 5,
+    title: "Aurora Digital",
+    image: "/carousel/project-5.jpg",
+    link: "/work/aurora-digital",
+    textTheme: {
+      primary: "#ffffff",
+      secondary: "rgba(255,255,255,0.7)",
+      glow: "0 0 24px rgba(0,0,0,0.86), 0 2px 8px rgba(0,0,0,0.78)",
+      ctaBackground: "rgba(255,255,255,0.14)",
+      ctaBorder: "rgba(255,255,255,0.4)",
+    },
+  },
 ];
 
 const TOTAL = carouselItems.length;
@@ -44,7 +113,27 @@ function buildSlotMap(activeIndex: number, stagingSide: StagingSide = -2): Recor
   return map;
 }
 
-function getSlotStyle(slot: Slot): React.CSSProperties {
+const CARD_TRANSITION = {
+  duration: 0.55,
+  ease: [0.4, 0, 0.2, 1],
+} as const;
+const NEXT_IMAGE_WIDTHS = [16, 32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840] as const;
+
+function getNextImageWidth(minWidth: number) {
+  return NEXT_IMAGE_WIDTHS.find((width) => width >= minWidth) ?? NEXT_IMAGE_WIDTHS[NEXT_IMAGE_WIDTHS.length - 1];
+}
+
+interface SlotVisual {
+  x: number;
+  rotateY: number;
+  scale: number;
+  opacity: number;
+  zIndex: number;
+  visibility: "hidden" | "visible";
+  pointerEvents: "auto" | "none";
+}
+
+function getSlotVisual(slot: Slot): SlotVisual {
   // Slots ±2 are invisible staging positions far off-screen
   const OFFSET = 400;  // px between adjacent visible cards
   const STAGE = 900;  // px for hidden staging positions
@@ -55,24 +144,52 @@ function getSlotStyle(slot: Slot): React.CSSProperties {
   const zIndex = slot === 0 ? 30 : Math.abs(slot) === 1 ? 10 : 0;
 
   return {
-    transform: `translateX(${x}px) rotateY(${rotateY}deg) scale(${scale})`,
+    x,
+    rotateY,
+    scale,
     opacity,
     zIndex,
-    // Hide staging slots from screen readers / hit-testing
     visibility: Math.abs(slot) >= 2 ? "hidden" : "visible",
     pointerEvents: slot === 0 ? "auto" : "none",
-    transition:
-      "transform 550ms cubic-bezier(0.4, 0, 0.2, 1), opacity 550ms ease, visibility 0ms linear 550ms",
   };
 }
 
 const SWIPE_THRESHOLD = 40; // px required to trigger a swipe
 
+interface CarouselState {
+  activeIndex: number;
+  isAnimating: boolean;
+  slotMap: Record<number, Slot>;
+}
+
+type CarouselAction =
+  | { type: "start-navigation"; targetIndex: number; stagingSide: StagingSide }
+  | { type: "complete-animation" };
+
+function carouselReducer(state: CarouselState, action: CarouselAction): CarouselState {
+  if (action.type === "start-navigation") {
+    return {
+      ...state,
+      activeIndex: action.targetIndex,
+      isAnimating: true,
+      slotMap: buildSlotMap(action.targetIndex, action.stagingSide),
+    };
+  }
+
+  return {
+    ...state,
+    isAnimating: false,
+  };
+}
+
 export function HeroCarousel() {
-  const [activeIndex, setActiveIndex] = useState(2);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
-  const [slotMap, setSlotMap] = useState<Record<number, Slot>>(() => buildSlotMap(2));
+  const [carouselState, dispatch] = useReducer(carouselReducer, {
+    activeIndex: 2,
+    isAnimating: false,
+    slotMap: buildSlotMap(2),
+  });
+  const { activeIndex, isAnimating, slotMap } = carouselState;
 
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -81,22 +198,23 @@ export function HeroCarousel() {
   const navigate = useCallback(
     (direction: "prev" | "next") => {
       if (isAnimating) return;
-      setIsAnimating(true);
       const stagingSide: StagingSide = direction === "next" ? -2 : 2;
+      const targetIndex =
+        direction === "next"
+          ? (activeIndex + 1) % TOTAL
+          : (activeIndex - 1 + TOTAL) % TOTAL;
 
-      setActiveIndex((prev) => {
-        const next =
-          direction === "next"
-            ? (prev + 1) % TOTAL
-            : (prev - 1 + TOTAL) % TOTAL;
-
-        setSlotMap(buildSlotMap(next, stagingSide));
-        return next;
-      });
-
-      setTimeout(() => setIsAnimating(false), 550);
+      dispatch({ type: "start-navigation", targetIndex, stagingSide });
     },
-    [isAnimating]
+    [activeIndex, isAnimating]
+  );
+
+  const handleCardAnimationComplete = useCallback(
+    (index: number) => {
+      if (!isAnimating || index !== activeIndex) return;
+      dispatch({ type: "complete-animation" });
+    },
+    [activeIndex, isAnimating]
   );
 
   useEffect(() => {
@@ -177,19 +295,27 @@ export function HeroCarousel() {
       return `/_next/image?${params.toString()}`;
     };
 
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const baseCssWidth = isMobile ? window.innerWidth : 420;
+    const widthsToPrefetch = Array.from(
+      new Set([
+        getNextImageWidth(baseCssWidth),
+        getNextImageWidth(baseCssWidth * dpr),
+      ])
+    );
+
     prefetchIndices.forEach((i) => {
-      const img = new window.Image();
-      img.decoding = "async";
-      img.src = nextImageUrl(carouselItems[i].image, 828);
+      widthsToPrefetch.forEach((width) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.src = nextImageUrl(carouselItems[i].image, width);
+      });
     });
   }, [activeIndex]);
 
   const activeItem = carouselItems[activeIndex];
-  const activeColor = {
-    primary: "#ffffff",
-    secondary: "rgba(255,255,255,0.65)",
-    glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
-  };
+  const activeColor = activeItem.textTheme;
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
@@ -202,6 +328,7 @@ export function HeroCarousel() {
 
       {/* Carousel track — drag / swipe area */}
       <div
+        data-testid="carousel-track"
         className="relative flex h-[400px] w-full items-center justify-center select-none"
         style={{ perspective: "1400px", perspectiveOrigin: "50% 50%", cursor: isDraggingCursor ? "grabbing" : "grab" }}
         onPointerDown={onPointerDown}
@@ -228,12 +355,29 @@ export function HeroCarousel() {
           const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
           const isPriority = isActive || slot === 1;
+          const visual = getSlotVisual(slot);
 
           return (
-            <div
-              key={item.id}            // stable key — React never unmounts/remounts
+            <motion.div
+              key={item.id}
+              data-carousel-item={item.id}
+              data-carousel-title={item.title}
               className="absolute"
-              style={getSlotStyle(slot)}
+              initial={false}
+              animate={{
+                x: visual.x,
+                rotateY: visual.rotateY,
+                scale: visual.scale,
+                opacity: visual.opacity,
+              }}
+              transition={CARD_TRANSITION}
+              onAnimationComplete={() => handleCardAnimationComplete(index)}
+              style={{
+                zIndex: visual.zIndex,
+                visibility: visual.visibility,
+                pointerEvents: visual.pointerEvents,
+                willChange: "transform, opacity",
+              }}
             >
               <div
                 className={`relative overflow-hidden rounded-2xl ${isActive ? "ring-1 ring-white/10 shadow-2xl shadow-black/60" : ""
@@ -256,7 +400,7 @@ export function HeroCarousel() {
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               </div>
-            </div>
+            </motion.div>
           );
         })}
 
@@ -282,20 +426,20 @@ export function HeroCarousel() {
             ))}
           </h2>
 
-          <a
+          <Link
             href={activeItem.link}
             className="pointer-events-auto flex h-11 items-center justify-center rounded-full border px-8 text-sm font-medium backdrop-blur-md hover:scale-105 focus-visible:outline-none focus-visible:ring-2"
             style={{
               transition:
                 "color 500ms ease, background-color 500ms ease, border-color 500ms ease, box-shadow 500ms ease, transform 200ms ease",
-              backgroundColor: "rgba(255,255,255,0.12)",
-              borderColor: "rgba(255,255,255,0.35)",
+              backgroundColor: activeColor.ctaBackground,
+              borderColor: activeColor.ctaBorder,
               color: activeColor.primary,
               boxShadow: activeColor.glow,
             }}
           >
             View Case
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -330,10 +474,7 @@ export function HeroCarousel() {
               const backwardDistance = (activeIndex - i + TOTAL) % TOTAL;
               const inferredDirection = forwardDistance <= backwardDistance ? "next" : "prev";
               const stagingSide: StagingSide = inferredDirection === "next" ? -2 : 2;
-              setIsAnimating(true);
-              setActiveIndex(i);
-              setSlotMap(buildSlotMap(i, stagingSide));
-              setTimeout(() => setIsAnimating(false), 550);
+              dispatch({ type: "start-navigation", targetIndex: i, stagingSide });
             }}
             aria-label={`Go to ${item.title}`}
             className="rounded-full transition-all duration-300"
