@@ -123,7 +123,17 @@ function getNextImageWidth(minWidth: number) {
   return NEXT_IMAGE_WIDTHS.find((width) => width >= minWidth) ?? NEXT_IMAGE_WIDTHS[NEXT_IMAGE_WIDTHS.length - 1];
 }
 
-function getSlotVisual(slot: Slot) {
+interface SlotVisual {
+  x: number;
+  rotateY: number;
+  scale: number;
+  opacity: number;
+  zIndex: number;
+  visibility: "hidden" | "visible";
+  pointerEvents: "auto" | "none";
+}
+
+function getSlotVisual(slot: Slot): SlotVisual {
   // Slots ±2 are invisible staging positions far off-screen
   const OFFSET = 400;  // px between adjacent visible cards
   const STAGE = 900;  // px for hidden staging positions
