@@ -122,7 +122,14 @@ export function HeroCarousel() {
           : (activeIndex - 1 + TOTAL) % TOTAL;
 
       dispatch({ type: "start-navigation", targetIndex, stagingSide });
-      setTimeout(() => dispatch({ type: "complete-animation" }), 550);
+    },
+    [activeIndex, isAnimating]
+  );
+
+  const handleCardAnimationComplete = useCallback(
+    (index: number) => {
+      if (!isAnimating || index !== activeIndex) return;
+      dispatch({ type: "complete-animation" });
     },
     [activeIndex, isAnimating]
   );
@@ -270,6 +277,7 @@ export function HeroCarousel() {
                 opacity: visual.opacity,
               }}
               transition={CARD_TRANSITION}
+              onAnimationComplete={() => handleCardAnimationComplete(index)}
               style={{
                 zIndex: visual.zIndex,
                 visibility: visual.visibility,
@@ -373,7 +381,6 @@ export function HeroCarousel() {
               const inferredDirection = forwardDistance <= backwardDistance ? "next" : "prev";
               const stagingSide: StagingSide = inferredDirection === "next" ? -2 : 2;
               dispatch({ type: "start-navigation", targetIndex: i, stagingSide });
-              setTimeout(() => dispatch({ type: "complete-animation" }), 550);
             }}
             aria-label={`Go to ${item.title}`}
             className="rounded-full transition-all duration-300"
