@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { ServicesProcessSteps } from "@/components/services-process-steps";
 
 const planColors = {
   kickstart: { color: "bg-slate-card", textColor: "text-white" },
@@ -102,21 +103,7 @@ export default async function ServicesPage({
               {dictionary.services.processBody}
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {dictionary.services.processSteps.map((step) => (
-              <div key={step.number} className="group">
-                <div className="mb-4 text-5xl font-bold text-accent opacity-30 transition-opacity group-hover:opacity-100">
-                  {step.number}
-                </div>
-                <h3 className="mb-2 text-xl font-bold text-foreground">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            ))}
-          </div>
+          <ServicesProcessSteps steps={dictionary.services.processSteps} />
         </div>
       </section>
 
