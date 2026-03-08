@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface CarouselItem {
   id: number;
@@ -44,7 +45,12 @@ function buildSlotMap(activeIndex: number, stagingSide: StagingSide = -2): Recor
   return map;
 }
 
-function getSlotStyle(slot: Slot): React.CSSProperties {
+const CARD_TRANSITION = {
+  duration: 0.55,
+  ease: [0.4, 0, 0.2, 1],
+} as const;
+
+function getSlotVisual(slot: Slot) {
   // Slots ±2 are invisible staging positions far off-screen
   const OFFSET = 400;  // px between adjacent visible cards
   const STAGE = 900;  // px for hidden staging positions
@@ -55,14 +61,13 @@ function getSlotStyle(slot: Slot): React.CSSProperties {
   const zIndex = slot === 0 ? 30 : Math.abs(slot) === 1 ? 10 : 0;
 
   return {
-    transform: `translateX(${x}px) rotateY(${rotateY}deg) scale(${scale})`,
+    x,
+    rotateY,
+    scale,
     opacity,
     zIndex,
-    // Hide staging slots from screen readers / hit-testing
     visibility: Math.abs(slot) >= 2 ? "hidden" : "visible",
     pointerEvents: slot === 0 ? "auto" : "none",
-    transition:
-      "transform 550ms cubic-bezier(0.4, 0, 0.2, 1), opacity 550ms ease, visibility 0ms linear 550ms",
   };
 }
 
@@ -228,12 +233,26 @@ export function HeroCarousel() {
           const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
           const isPriority = isActive || slot === 1;
+          const visual = getSlotVisual(slot);
 
           return (
-            <div
-              key={item.id}            // stable key — React never unmounts/remounts
+            <motion.div
+              key={item.id}
               className="absolute"
-              style={getSlotStyle(slot)}
+              initial={false}
+              animate={{
+                x: visual.x,
+                rotateY: visual.rotateY,
+                scale: visual.scale,
+                opacity: visual.opacity,
+              }}
+              transition={CARD_TRANSITION}
+              style={{
+                zIndex: visual.zIndex,
+                visibility: visual.visibility,
+                pointerEvents: visual.pointerEvents,
+                willChange: "transform, opacity",
+              }}
             >
               <div
                 className={`relative overflow-hidden rounded-2xl ${isActive ? "ring-1 ring-white/10 shadow-2xl shadow-black/60" : ""
@@ -256,7 +275,7 @@ export function HeroCarousel() {
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               </div>
-            </div>
+            </motion.div>
           );
         })}
 
