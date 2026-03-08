@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "dinhstudio | Web Design & Development",
   description: "Premium web design and development studio. We build and host beautiful, high-performance websites.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
