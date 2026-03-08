@@ -23,10 +23,11 @@ const TOTAL = carouselItems.length;
 
 // Slot values: -1 = left, 0 = center, 1 = right, ±2 = hidden staging area
 type Slot = -2 | -1 | 0 | 1 | 2;
+type StagingSide = -2 | 2;
 
 // Returns which "slot" (visual position) each item index occupies,
 // given the current active index.
-function buildSlotMap(activeIndex: number): Record<number, Slot> {
+function buildSlotMap(activeIndex: number, stagingSide: StagingSide = -2): Record<number, Slot> {
   const map: Record<number, Slot> = {};
   const prev = (activeIndex - 1 + TOTAL) % TOTAL;
   const next = (activeIndex + 1) % TOTAL;
@@ -36,8 +37,7 @@ function buildSlotMap(activeIndex: number): Record<number, Slot> {
     else if (i === prev) map[i] = -1;
     else if (i === next) map[i] = 1;
     else {
-      // Hide everything else off to the left staging area by default
-      map[i] = -2;
+      map[i] = stagingSide;
     }
   });
 
@@ -82,6 +82,7 @@ export function HeroCarousel() {
     (direction: "prev" | "next") => {
       if (isAnimating) return;
       setIsAnimating(true);
+      const stagingSide: StagingSide = direction === "next" ? -2 : 2;
 
       setActiveIndex((prev) => {
         const next =
@@ -89,7 +90,7 @@ export function HeroCarousel() {
             ? (prev + 1) % TOTAL
             : (prev - 1 + TOTAL) % TOTAL;
 
-        setSlotMap(buildSlotMap(next));
+        setSlotMap(buildSlotMap(next, stagingSide));
         return next;
       });
 
@@ -325,9 +326,13 @@ export function HeroCarousel() {
             key={item.id}
             onClick={() => {
               if (isAnimating || i === activeIndex) return;
+              const forwardDistance = (i - activeIndex + TOTAL) % TOTAL;
+              const backwardDistance = (activeIndex - i + TOTAL) % TOTAL;
+              const inferredDirection = forwardDistance <= backwardDistance ? "next" : "prev";
+              const stagingSide: StagingSide = inferredDirection === "next" ? -2 : 2;
               setIsAnimating(true);
               setActiveIndex(i);
-              setSlotMap(buildSlotMap(i));
+              setSlotMap(buildSlotMap(i, stagingSide));
               setTimeout(() => setIsAnimating(false), 550);
             }}
             aria-label={`Go to ${item.title}`}
