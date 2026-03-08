@@ -1,6 +1,7 @@
 "use client";
 
 import { isValidLocale, type AppLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -10,12 +11,6 @@ interface NavbarProps {
   alwaysVisible?: boolean;
   hideUntilScroll?: boolean;
 }
-
-const navLinks = [
-  { href: "/work", label: "Work" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-];
 
 const localeOptions: Array<{ locale: AppLocale; label: string }> = [
   { locale: "en-us", label: "EN" },
@@ -41,6 +36,12 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   const pathnameSegments = pathname.split("/").filter(Boolean);
   const pathLocale = pathnameSegments[0]?.toLowerCase();
   const activeLocale: AppLocale = isValidLocale(pathLocale) ? pathLocale : "en-us";
+  const dictionary = getDictionary(activeLocale);
+  const navLinks = [
+    { href: "/work", label: dictionary.nav.work },
+    { href: "/services", label: dictionary.nav.services },
+    { href: "/about", label: dictionary.nav.about },
+  ];
   const pathWithoutLocale =
     isValidLocale(pathLocale) ? `/${pathnameSegments.slice(1).join("/")}` : pathname;
   const normalizedPath = pathWithoutLocale === "/" ? "" : pathWithoutLocale;
@@ -180,7 +181,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           </Link>
 
           {/* Desktop centre nav links */}
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
+          <nav className="hidden items-center gap-8 md:flex" aria-label={dictionary.nav.mainNavigation}>
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
@@ -216,14 +217,14 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
               href={withLocale("/contact")}
               className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
             >
-              Get in touch
+              {dictionary.nav.getInTouch}
             </Link>
 
             {/* Hamburger — mobile only */}
             <button
               onClick={() => setMobileOpen((o) => !o)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-label={mobileOpen ? dictionary.nav.closeMenu : dictionary.nav.openMenu}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
             >
@@ -238,7 +239,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label={dictionary.nav.navigationMenu}
         className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
@@ -250,7 +251,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         <div className="h-[65px]" />
 
         {/* Nav links */}
-        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label="Mobile navigation">
+        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label={dictionary.nav.mobileNavigation}>
           {navLinks.map(({ href, label }, i) => (
             <Link
               key={href}
@@ -293,7 +294,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
             onClick={() => setMobileOpen(false)}
             className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
           >
-            Get in touch
+            {dictionary.nav.getInTouch}
           </Link>
         </div>
       </div>

@@ -18,6 +18,10 @@ export default async function Home({
   }
 
   const dictionary = getDictionary(locale);
+  const withLocale = (href: string) => {
+    if (href === "/") return `/${locale}`;
+    return `/${locale}${href}`;
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -43,20 +47,18 @@ export default async function Home({
           <div className="mb-32 grid gap-16 md:grid-cols-2">
             <div>
               <h2 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl text-balance">
-                We craft digital experiences that captivate and convert.
+                {dictionary.home.introHeading}
               </h2>
             </div>
             <div className="flex flex-col justify-center">
               <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-                dinhstudio is a web design and development studio dedicated to
-                building beautiful, high-performance websites that help
-                businesses stand out in the digital landscape.
+                {dictionary.home.introBody}
               </p>
               <Link
-                href="/services"
+                href={withLocale("/services")}
                 className="group flex items-center gap-2 text-foreground font-medium"
               >
-                Explore our services
+                {dictionary.home.exploreServices}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
@@ -65,10 +67,10 @@ export default async function Home({
           {/* Stats Section */}
           <div className="mb-32 grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
-              { value: "50+", label: "Projects Delivered" },
-              { value: "100%", label: "Client Satisfaction" },
-              { value: "5+", label: "Years Experience" },
-              { value: "24/7", label: "Support Available" },
+              { value: "50+", label: dictionary.home.stats.projectsDelivered },
+              { value: "100%", label: dictionary.home.stats.clientSatisfaction },
+              { value: "5+", label: dictionary.home.stats.yearsExperience },
+              { value: "24/7", label: dictionary.home.stats.supportAvailable },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -88,31 +90,31 @@ export default async function Home({
           <div className="mb-32">
             <div className="mb-12 flex items-end justify-between">
               <h3 className="text-3xl font-bold tracking-tight text-foreground">
-                Our Services
+                {dictionary.home.servicesTitle}
               </h3>
               <Link
-                href="/services"
+                href={withLocale("/services")}
                 className="group flex items-center gap-2 text-muted-foreground hover:text-foreground"
               >
-                View all
+                {dictionary.home.viewAll}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: "Kickstart",
-                  description: "Start fresh with a brand new website tailored to your vision.",
+                  title: dictionary.home.serviceCards.kickstartTitle,
+                  description: dictionary.home.serviceCards.kickstartDescription,
                   color: "bg-slate-card",
                 },
                 {
-                  title: "Revamp",
-                  description: "Transform your existing website into something extraordinary.",
+                  title: dictionary.home.serviceCards.revampTitle,
+                  description: dictionary.home.serviceCards.revampDescription,
                   color: "bg-olive-card",
                 },
                 {
-                  title: "Sustain",
-                  description: "Ongoing hosting, maintenance, and support for your site.",
+                  title: dictionary.home.serviceCards.sustainTitle,
+                  description: dictionary.home.serviceCards.sustainDescription,
                   color: "bg-terracotta-card",
                 },
               ].map((service, index) => (
@@ -133,17 +135,16 @@ export default async function Home({
           <div className="relative overflow-hidden rounded-3xl bg-card p-12 md:p-20">
             <div className="relative z-10 flex flex-col items-center text-center">
               <h3 className="mb-6 text-3xl font-bold tracking-tight text-foreground md:text-4xl text-balance">
-                Ready to bring your vision to life?
+                {dictionary.home.ctaHeading}
               </h3>
               <p className="mb-8 max-w-xl text-muted-foreground">
-                {"Let's"} collaborate to create a website that truly represents your
-                brand and drives results.
+                {dictionary.home.ctaBody}
               </p>
               <Link
-                href="/contact"
+                href={withLocale("/contact")}
                 className="flex h-12 items-center justify-center rounded-full bg-accent px-8 font-medium text-accent-foreground transition-all hover:scale-105 glow-accent"
               >
-                Get in touch
+                {dictionary.home.ctaButton}
               </Link>
             </div>
             {/* Background decoration */}
@@ -159,28 +160,28 @@ export default async function Home({
           <div className="text-xl font-bold tracking-tight">dinhstudio</div>
           <div className="flex items-center gap-8">
             <Link
-              href="/work"
+              href={withLocale("/work")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Work
+              {dictionary.nav.work}
             </Link>
             <Link
-              href="/services"
+              href={withLocale("/services")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Services
+              {dictionary.nav.services}
             </Link>
             <Link
-              href="/about"
+              href={withLocale("/about")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              About
+              {dictionary.nav.about}
             </Link>
             <Link
-              href="/contact"
+              href={withLocale("/contact")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Contact
+              {dictionary.nav.contact}
             </Link>
           </div>
           <div className="text-sm text-muted-foreground">
