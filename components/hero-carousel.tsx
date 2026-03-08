@@ -196,19 +196,30 @@ export function HeroCarousel() {
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const isDragging = useRef(false);
+  const activeIndexRef = useRef(activeIndex);
+  const isAnimatingRef = useRef(isAnimating);
+
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  useEffect(() => {
+    isAnimatingRef.current = isAnimating;
+  }, [isAnimating]);
 
   const navigate = useCallback(
     (direction: "prev" | "next") => {
-      if (isAnimating) return;
+      if (isAnimatingRef.current) return;
       const stagingSide: StagingSide = direction === "next" ? -2 : 2;
+      const currentIndex = activeIndexRef.current;
       const targetIndex =
         direction === "next"
-          ? (activeIndex + 1) % TOTAL
-          : (activeIndex - 1 + TOTAL) % TOTAL;
+          ? (currentIndex + 1) % TOTAL
+          : (currentIndex - 1 + TOTAL) % TOTAL;
 
       dispatch({ type: "start-navigation", targetIndex, stagingSide });
     },
-    [activeIndex, isAnimating]
+    []
   );
 
   const handleCardAnimationComplete = useCallback(
@@ -229,14 +240,14 @@ export function HeroCarousel() {
   }, [navigate]);
 
   useEffect(() => {
-    if (isAnimating || isInteracting) return;
+    if (isInteracting) return;
 
     const timeoutId = window.setTimeout(() => {
       navigate("next");
     }, AUTO_ADVANCE_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [isAnimating, isInteracting, navigate]);
+  }, [activeIndex, isInteracting, navigate]);
 
   // ── Pointer (mouse + stylus) handlers ────────────────────────────────────
   const onPointerDown = useCallback((e: React.PointerEvent) => {
