@@ -155,6 +155,7 @@ function getSlotVisual(slot: Slot): SlotVisual {
 }
 
 const SWIPE_THRESHOLD = 40; // px required to trigger a swipe
+const AUTO_ADVANCE_MS = 5000;
 
 interface CarouselState {
   activeIndex: number;
@@ -184,6 +185,7 @@ function carouselReducer(state: CarouselState, action: CarouselAction): Carousel
 
 export function HeroCarousel() {
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
   const [carouselState, dispatch] = useReducer(carouselReducer, {
     activeIndex: 2,
     isAnimating: false,
@@ -226,10 +228,21 @@ export function HeroCarousel() {
     return () => window.removeEventListener("keydown", handler);
   }, [navigate]);
 
+  useEffect(() => {
+    if (isAnimating || isInteracting) return;
+
+    const timeoutId = window.setTimeout(() => {
+      navigate("next");
+    }, AUTO_ADVANCE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isAnimating, isInteracting, navigate]);
+
   // ── Pointer (mouse + stylus) handlers ────────────────────────────────────
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     dragStart.current = { x: e.clientX, y: e.clientY };
     isDragging.current = false;
+    setIsInteracting(true);
     setIsDraggingCursor(true);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }, []);
@@ -243,6 +256,7 @@ export function HeroCarousel() {
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
       setIsDraggingCursor(false);
+      setIsInteracting(false);
       if (!dragStart.current) return;
       const dx = e.clientX - dragStart.current.x;
       dragStart.current = null;
@@ -256,6 +270,7 @@ export function HeroCarousel() {
   const onPointerCancel = useCallback(() => {
     dragStart.current = null;
     isDragging.current = false;
+    setIsInteracting(false);
     setIsDraggingCursor(false);
   }, []);
 
@@ -265,10 +280,12 @@ export function HeroCarousel() {
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     const t = e.touches[0];
     touchStart.current = { x: t.clientX, y: t.clientY };
+    setIsInteracting(true);
   }, []);
 
   const onTouchEnd = useCallback(
     (e: React.TouchEvent) => {
+      setIsInteracting(false);
       if (!touchStart.current) return;
       const t = e.changedTouches[0];
       const dx = t.clientX - touchStart.current.x;
@@ -281,6 +298,11 @@ export function HeroCarousel() {
     },
     [navigate]
   );
+
+  const onTouchCancel = useCallback(() => {
+    touchStart.current = null;
+    setIsInteracting(false);
+  }, []);
 
   // Keep upcoming slides warm for faster first interactions on slower networks.
   useEffect(() => {
@@ -337,6 +359,7 @@ export function HeroCarousel() {
         onPointerCancel={onPointerCancel}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchCancel}
       >
         {/*
           Edge fade masks: dissolve side cards into the background at the
