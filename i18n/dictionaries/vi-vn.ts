@@ -41,4 +41,37 @@ export const viVN = {
     ctaBody: "Hãy cùng hợp tác để tạo một website thể hiện đúng thương hiệu và tạo kết quả thực tế.",
     ctaButton: "Liên hệ ngay",
   },
+  about: {
+    heroTitle: "Giới thiệu",
+    heroBody: "Một studio thiết kế web đầy đam mê, chuyên tạo nên các trải nghiệm số đẹp mắt và hiệu năng cao.",
+    missionTitle: "Chúng tôi tin rằng thiết kế xuất sắc là nền tảng của một doanh nghiệp mạnh.",
+    missionBodyOne:
+      "dinhstudio được thành lập với niềm tin rằng mọi doanh nghiệp đều xứng đáng có một hiện diện số ấn tượng. Chúng tôi kết hợp thiết kế tinh tế với công nghệ hiện đại để tạo ra website không chỉ đẹp mà còn mang lại kết quả thực tế.",
+    missionBodyTwo:
+      "Cách làm việc của chúng tôi đề cao sự hợp tác và minh bạch. Chúng tôi làm việc chặt chẽ với khách hàng để hiểu tầm nhìn, mục tiêu và đối tượng của họ, rồi chuyển hóa điều đó thành trải nghiệm số vượt kỳ vọng.",
+    valuesTitle: "Giá trị cốt lõi",
+    valueCards: {
+      craftsmanshipTitle: "Tính chỉn chu",
+      craftsmanshipDescription: "Chúng tôi trân trọng từng pixel, từng dòng code. Chất lượng luôn được đặt lên hàng đầu.",
+      collaborationTitle: "Hợp tác",
+      collaborationDescription: "Sản phẩm tốt nhất đến từ sự đồng hành. Ý tưởng của bạn định hình quy trình của chúng tôi.",
+      innovationTitle: "Đổi mới",
+      innovationDescription: "Chúng tôi luôn cập nhật xu hướng và công nghệ để tạo ra giải pháp tiên tiến.",
+    },
+    capabilitiesTitle: "Chúng tôi làm gì",
+    capabilities: {
+      webDesignTitle: "Thiết kế web",
+      webDesignItems: ["Thiết kế UI/UX", "Nhận diện thương hiệu", "Design System", "Prototyping"],
+      developmentTitle: "Phát triển",
+      developmentItems: ["Website tùy chỉnh", "Ứng dụng web", "Thương mại điện tử", "Tích hợp CMS"],
+      strategyTitle: "Chiến lược",
+      strategyItems: ["Chiến lược nội dung", "Tối ưu SEO", "Nghiên cứu người dùng", "Phân tích dữ liệu"],
+      supportTitle: "Hỗ trợ",
+      supportItems: ["Hosting quản lý", "Bảo trì", "Tối ưu hiệu năng", "Bảo mật"],
+    },
+    techTitle: "Công nghệ chúng tôi yêu thích",
+    ctaTitle: "Sẵn sàng bắt đầu dự án?",
+    ctaBody: "Hãy cùng nhau tạo nên điều tuyệt vời.",
+    ctaButton: "Liên hệ ngay",
+  },
 } as const satisfies TranslationDictionary;
