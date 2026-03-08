@@ -117,6 +117,11 @@ const CARD_TRANSITION = {
   duration: 0.55,
   ease: [0.4, 0, 0.2, 1],
 } as const;
+const NEXT_IMAGE_WIDTHS = [16, 32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840] as const;
+
+function getNextImageWidth(minWidth: number) {
+  return NEXT_IMAGE_WIDTHS.find((width) => width >= minWidth) ?? NEXT_IMAGE_WIDTHS[NEXT_IMAGE_WIDTHS.length - 1];
+}
 
 function getSlotVisual(slot: Slot) {
   // Slots ±2 are invisible staging positions far off-screen
@@ -280,10 +285,22 @@ export function HeroCarousel() {
       return `/_next/image?${params.toString()}`;
     };
 
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 3));
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const baseCssWidth = isMobile ? window.innerWidth : 420;
+    const widthsToPrefetch = Array.from(
+      new Set([
+        getNextImageWidth(baseCssWidth),
+        getNextImageWidth(baseCssWidth * dpr),
+      ])
+    );
+
     prefetchIndices.forEach((i) => {
-      const img = new window.Image();
-      img.decoding = "async";
-      img.src = nextImageUrl(carouselItems[i].image, 828);
+      widthsToPrefetch.forEach((width) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.src = nextImageUrl(carouselItems[i].image, width);
+      });
     });
   }, [activeIndex]);
 
