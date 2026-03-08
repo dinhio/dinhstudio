@@ -12,6 +12,7 @@ export function ServicesProcessSteps({ steps }: { steps: ProcessStep[] }) {
   const [isMobile, setIsMobile] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
+  const ratiosRef = useRef(new Map<number, number>());
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)");
@@ -27,28 +28,35 @@ export function ServicesProcessSteps({ steps }: { steps: ProcessStep[] }) {
   }, []);
 
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile) {
+      ratiosRef.current.clear();
+      return;
+    }
+
+    ratiosRef.current.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        let nextActive: number | null = null;
-        let highestRatio = 0;
-
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
           const index = Number((entry.target as HTMLElement).dataset.stepIndex);
-          if (!Number.isNaN(index) && entry.intersectionRatio >= highestRatio) {
-            highestRatio = entry.intersectionRatio;
+          if (Number.isNaN(index)) continue;
+          ratiosRef.current.set(index, entry.isIntersecting ? entry.intersectionRatio : 0);
+        }
+
+        let nextActive = 0;
+        let highestRatio = -1;
+
+        for (const [index, ratio] of ratiosRef.current) {
+          if (ratio > highestRatio) {
+            highestRatio = ratio;
             nextActive = index;
           }
         }
 
-        if (nextActive !== null) {
-          setActiveIndex(nextActive);
-        }
+        setActiveIndex(nextActive);
       },
       {
-        threshold: 0.6,
+        threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
       },
     );
 
@@ -59,7 +67,7 @@ export function ServicesProcessSteps({ steps }: { steps: ProcessStep[] }) {
     return () => {
       observer.disconnect();
     };
-  }, [isMobile]);
+  }, [isMobile, steps.length]);
 
   return (
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
