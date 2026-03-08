@@ -1,6 +1,6 @@
 import { HeroCarousel } from "@/components/hero-carousel";
 import { Navbar } from "@/components/navbar";
-import { isValidLocale } from "@/i18n/config";
+import { parseLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -12,15 +12,16 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const normalizedLocale = parseLocale(locale);
 
-  if (!isValidLocale(locale)) {
+  if (!normalizedLocale) {
     notFound();
   }
 
-  const dictionary = getDictionary(locale);
+  const dictionary = getDictionary(normalizedLocale);
   const withLocale = (href: string) => {
-    if (href === "/") return `/${locale}`;
-    return `/${locale}${href}`;
+    if (href === "/") return `/${normalizedLocale}`;
+    return `/${normalizedLocale}${href}`;
   };
 
   return (
