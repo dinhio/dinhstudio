@@ -21,10 +21,8 @@ const SCROLL_THRESHOLD_VH = 0.85;
 const MOUSE_PROXIMITY_ZONE = 80;
 
 export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
-  const [bgOpacity, setBgOpacity] = useState(alwaysVisible ? 1 : 0);
+  const [bgOpacity, setBgOpacity] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
-  // Track if navbar should be visible (for hideUntilScroll mode)
-  const [isRevealed, setIsRevealed] = useState(!hideUntilScroll);
   // Track if mouse is near top of viewport
   const [isMouseNearTop, setIsMouseNearTop] = useState(false);
   // Track if user has scrolled past threshold
@@ -32,8 +30,9 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   // Ref to track hiding timeout
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Calculate if navbar should be shown
-  const shouldShowNavbar = alwaysVisible || isRevealed || isMouseNearTop || hasScrolledPast;
+  // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
+  const shouldShowDesktopNavbar =
+    alwaysVisible || !hideUntilScroll || hasScrolledPast || isMouseNearTop;
 
   // Handle mouse proximity to top
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -61,11 +60,6 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
   // Handle scroll behavior
   useEffect(() => {
-    if (alwaysVisible) {
-      setBgOpacity(1);
-      return;
-    }
-
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const threshold = window.innerHeight * SCROLL_THRESHOLD_VH;
@@ -74,13 +68,9 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
       if (hideUntilScroll) {
         if (scrollY > threshold) {
           setHasScrolledPast(true);
-          setIsRevealed(true);
         } else if (scrollY < 50) {
           // Reset when scrolled back to top
           setHasScrolledPast(false);
-          if (!isMouseNearTop) {
-            setIsRevealed(false);
-          }
         }
       }
       
@@ -94,6 +84,13 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [alwaysVisible, hideUntilScroll, mobileOpen, isMouseNearTop]);
+
+  const backgroundOpacity =
+    alwaysVisible
+      ? 0.92
+      : hideUntilScroll && !alwaysVisible
+        ? (shouldShowDesktopNavbar ? (isMouseNearTop && !hasScrolledPast ? 1 : bgOpacity * 0.92) : 0)
+        : bgOpacity * 0.92;
 
   // Handle mouse move for proximity detection
   useEffect(() => {
@@ -113,7 +110,6 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
     if (!hideUntilScroll || alwaysVisible) return;
 
     const handleExploreClick = () => {
-      setIsRevealed(true);
       setHasScrolledPast(true);
     };
 
@@ -135,18 +131,23 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         One element for all screen sizes. Background fades in on scroll.
         Desktop shows centre links; mobile hides them behind hamburger.
       */}
-      <header className="fixed top-0 left-0 right-0 z-50">
+      <header className="fixed top-0 left-0 right-0 z-[80]">
         {/* Fading background layer — separate so content opacity is unaffected */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 backdrop-blur-md transition-opacity duration-300"
           style={{
             backgroundColor: "var(--background)",
-            opacity: bgOpacity * 0.92,
+            opacity: backgroundOpacity,
           }}
         />
 
-        <div className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+        <div
+          className={`relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4 transition-transform duration-300 md:transition-opacity ${shouldShowDesktopNavbar
+            ? "md:translate-y-0 md:opacity-100 md:pointer-events-auto"
+            : "md:-translate-y-full md:opacity-0 md:pointer-events-none"
+            }`}
+        >
           {/* Logo */}
           <Link
             href="/"

@@ -107,6 +107,7 @@ const SWIPE_THRESHOLD = 40; // px required to trigger a swipe
 export function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(2);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isDraggingCursor, setIsDraggingCursor] = useState(false);
   const [slotMap, setSlotMap] = useState<Record<number, Slot>>(() => buildSlotMap(2));
   const [textColors, setTextColors] = useState<
     Record<number, { primary: string; secondary: string; glow: string }>
@@ -150,6 +151,7 @@ export function HeroCarousel() {
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     dragStart.current = { x: e.clientX, y: e.clientY };
     isDragging.current = false;
+    setIsDraggingCursor(true);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }, []);
 
@@ -161,6 +163,7 @@ export function HeroCarousel() {
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent) => {
+      setIsDraggingCursor(false);
       if (!dragStart.current) return;
       const dx = e.clientX - dragStart.current.x;
       dragStart.current = null;
@@ -174,6 +177,7 @@ export function HeroCarousel() {
   const onPointerCancel = useCallback(() => {
     dragStart.current = null;
     isDragging.current = false;
+    setIsDraggingCursor(false);
   }, []);
 
   // ── Touch handlers (passive-safe, no preventDefault needed here) ─────────
@@ -246,7 +250,7 @@ export function HeroCarousel() {
       {/* Carousel track — drag / swipe area */}
       <div
         className="relative flex h-[400px] w-full items-center justify-center select-none"
-        style={{ perspective: "1400px", perspectiveOrigin: "50% 50%", cursor: isDragging.current ? "grabbing" : "grab" }}
+        style={{ perspective: "1400px", perspectiveOrigin: "50% 50%", cursor: isDraggingCursor ? "grabbing" : "grab" }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
