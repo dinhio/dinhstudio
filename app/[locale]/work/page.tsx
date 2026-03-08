@@ -2,102 +2,29 @@ import { Navbar } from "@/components/navbar";
 import { ArrowUpRight, Quote } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { parseLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
-interface Project {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  image: string;
-  testimonial: {
-    quote: string;
-    author: string;
-    role: string;
+export default async function WorkPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const normalizedLocale = parseLocale(locale);
+
+  if (!normalizedLocale) {
+    notFound();
+  }
+
+  const dictionary = getDictionary(normalizedLocale);
+  const withLocale = (href: string) => {
+    if (href === "/") return `/${normalizedLocale}`;
+    return `/${normalizedLocale}${href}`;
   };
-  link: string;
-  featured?: boolean;
-}
 
-const projects: Project[] = [
-  {
-    id: "neotech-labs",
-    title: "Neotech Labs",
-    category: "Tech Startup",
-    description:
-      "A complete brand identity and website redesign for a cutting-edge AI research company.",
-    image: "/carousel/project-2.jpg",
-    testimonial: {
-      quote:
-        "dinhstudio transformed our digital presence completely. The new website perfectly captures our innovative spirit and has significantly improved our conversion rates.",
-      author: "Sarah Chen",
-      role: "CEO, Neotech Labs",
-    },
-    link: "/work/neotech-labs",
-    featured: true,
-  },
-  {
-    id: "artisan-bloom",
-    title: "Artisan Bloom",
-    category: "E-commerce",
-    description:
-      "An elegant e-commerce platform for a boutique floral design studio.",
-    image: "/carousel/project-1.jpg",
-    testimonial: {
-      quote:
-        "Working with dinhstudio was a dream. They understood our aesthetic perfectly and delivered a website that our customers love.",
-      author: "Emma Richards",
-      role: "Founder, Artisan Bloom",
-    },
-    link: "/work/artisan-bloom",
-  },
-  {
-    id: "verdant-co",
-    title: "Verdant Co",
-    category: "Sustainability",
-    description:
-      "A mission-driven website for an environmental consulting firm.",
-    image: "/carousel/project-3.jpg",
-    testimonial: {
-      quote:
-        "The team at dinhstudio created a website that truly reflects our commitment to sustainability. The design is both beautiful and functional.",
-      author: "Michael Torres",
-      role: "Director, Verdant Co",
-    },
-    link: "/work/verdant-co",
-  },
-  {
-    id: "lumina-studio",
-    title: "Lumina Studio",
-    category: "Photography",
-    description:
-      "A stunning portfolio website for an award-winning photography studio.",
-    image: "/carousel/project-4.jpg",
-    testimonial: {
-      quote:
-        "As visual artists ourselves, we had high expectations. dinhstudio exceeded them all with a portfolio site that showcases our work beautifully.",
-      author: "David Park",
-      role: "Creative Director, Lumina Studio",
-    },
-    link: "/work/lumina-studio",
-  },
-  {
-    id: "aurora-digital",
-    title: "Aurora Digital",
-    category: "Digital Agency",
-    description:
-      "A bold, modern website for a digital marketing agency.",
-    image: "/carousel/project-5.jpg",
-    testimonial: {
-      quote:
-        "dinhstudio delivered a website that positions us as industry leaders. The design language is exactly what we envisioned.",
-      author: "Jessica Williams",
-      role: "Partner, Aurora Digital",
-    },
-    link: "/work/aurora-digital",
-  },
-];
-
-export default function WorkPage() {
+  const projects = dictionary.work.projects;
   const featuredProject = projects.find((p) => p.featured);
   const otherProjects = projects.filter((p) => !p.featured);
 
@@ -105,25 +32,22 @@ export default function WorkPage() {
     <main className="min-h-screen bg-background">
       <Navbar alwaysVisible />
 
-      {/* Hero Section */}
       <section className="pt-32 pb-16 px-6">
         <div className="mx-auto max-w-7xl">
           <h1 className="text-5xl font-bold tracking-tight text-foreground md:text-7xl">
-            Our Work
+            {dictionary.work.heroTitle}
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-            A selection of projects {"we've"} had the pleasure of working on. Each
-            one represents a unique collaboration and a story worth telling.
+            {dictionary.work.heroBody}
           </p>
         </div>
       </section>
 
-      {/* Featured Project */}
       {featuredProject && (
         <section className="px-6 pb-16">
           <div className="mx-auto max-w-7xl">
             <Link
-              href={featuredProject.link}
+              href={withLocale(featuredProject.link)}
               className="group relative block overflow-hidden rounded-3xl bg-card"
             >
               <div className="grid md:grid-cols-2">
@@ -138,7 +62,7 @@ export default function WorkPage() {
                 </div>
                 <div className="relative flex flex-col justify-center p-8 md:p-12">
                   <span className="mb-4 inline-block text-sm font-medium text-accent">
-                    Featured Project
+                    {dictionary.work.featuredLabel}
                   </span>
                   <h2 className="mb-2 text-3xl font-bold text-foreground md:text-4xl">
                     {featuredProject.title}
@@ -150,7 +74,6 @@ export default function WorkPage() {
                     {featuredProject.description}
                   </p>
 
-                  {/* Testimonial */}
                   <div className="border-l-2 border-accent pl-6">
                     <Quote className="mb-3 h-5 w-5 text-accent" />
                     <p className="mb-4 text-sm italic text-foreground/80">
@@ -167,7 +90,7 @@ export default function WorkPage() {
                   </div>
 
                   <div className="mt-8 flex items-center gap-2 text-foreground">
-                    <span className="text-sm font-medium">View Project</span>
+                    <span className="text-sm font-medium">{dictionary.work.viewProject}</span>
                     <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                   </div>
                 </div>
@@ -177,14 +100,13 @@ export default function WorkPage() {
         </section>
       )}
 
-      {/* Other Projects Grid */}
       <section className="px-6 pb-32">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 md:grid-cols-2">
             {otherProjects.map((project) => (
               <Link
                 key={project.id}
-                href={project.link}
+                href={withLocale(project.link)}
                 className="group relative overflow-hidden rounded-2xl bg-card"
               >
                 <div className="relative aspect-[16/10]">
@@ -212,7 +134,6 @@ export default function WorkPage() {
                     {project.description}
                   </p>
 
-                  {/* Testimonial */}
                   <div className="border-t border-border pt-6">
                     <p className="mb-3 text-sm italic text-foreground/70">
                       {`"${project.testimonial.quote.slice(0, 120)}..."`}
@@ -243,52 +164,71 @@ export default function WorkPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="border-t border-border px-6 py-24">
         <div className="mx-auto max-w-7xl text-center">
           <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Want to be our next success story?
+            {dictionary.work.ctaTitle}
           </h2>
           <p className="mb-8 text-muted-foreground">
-            {"Let's"} create something amazing together.
+            {dictionary.work.ctaBody}
           </p>
           <Link
-            href="/contact"
+            href={withLocale("/contact")}
             className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-8 font-medium text-accent-foreground transition-all hover:scale-105 glow-accent"
           >
-            Start your project
+            {dictionary.work.ctaButton}
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-border py-12 px-6">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
           <div className="text-xl font-bold tracking-tight">dinhstudio</div>
           <div className="flex items-center gap-8">
             <Link
-              href="/work"
+              href={withLocale("/work")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Work
+              {dictionary.nav.work}
             </Link>
             <Link
-              href="/services"
+              href={withLocale("/services")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Services
+              {dictionary.nav.services}
             </Link>
             <Link
-              href="/about"
+              href={withLocale("/about")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              About
+              {dictionary.nav.about}
             </Link>
             <Link
-              href="/contact"
+              href={withLocale("/contact")}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Contact
+              {dictionary.nav.contact}
+            </Link>
+          </div>
+          <div className="flex items-center text-xs tracking-wide text-muted-foreground">
+            <Link
+              href="/en-us/work"
+              className={`px-0.5 transition-colors ${normalizedLocale === "en-us"
+                ? "font-bold text-foreground"
+                : "font-medium hover:text-foreground"
+                }`}
+            >
+              EN
+            </Link>
+            <span className="px-1 text-muted-foreground/70">/</span>
+            <Link
+              href="/vi-vn/work"
+              className={`px-0.5 transition-colors ${normalizedLocale === "vi-vn"
+                ? "font-bold text-foreground"
+                : "font-medium hover:text-foreground"
+                }`}
+            >
+              VI
             </Link>
           </div>
           <div className="text-sm text-muted-foreground">

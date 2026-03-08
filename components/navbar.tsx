@@ -1,6 +1,9 @@
 "use client";
 
+import { DEFAULT_LOCALE, parseLocale, type AppLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -9,10 +12,9 @@ interface NavbarProps {
   hideUntilScroll?: boolean;
 }
 
-const navLinks = [
-  { href: "/work", label: "Work" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
+const localeOptions: Array<{ locale: AppLocale; label: string }> = [
+  { locale: "en-us", label: "EN" },
+  { locale: "vi-vn", label: "VI" },
 ];
 
 // Threshold for scroll reveal (viewport height)
@@ -21,6 +23,7 @@ const SCROLL_THRESHOLD_VH = 0.85;
 const MOUSE_PROXIMITY_ZONE = 80;
 
 export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
+  const pathname = usePathname() ?? "/";
   const [bgOpacity, setBgOpacity] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   // Track if mouse is near top of viewport
@@ -29,6 +32,26 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   const [hasScrolledPast, setHasScrolledPast] = useState(false);
   // Ref to track hiding timeout
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const pathnameSegments = pathname.split("/").filter(Boolean);
+  const pathLocale = parseLocale(pathnameSegments[0]);
+  const activeLocale: AppLocale = pathLocale ?? DEFAULT_LOCALE;
+  const dictionary = getDictionary(activeLocale);
+  const navLinks = [
+    { href: "/work", label: dictionary.nav.work },
+    { href: "/services", label: dictionary.nav.services },
+    { href: "/about", label: dictionary.nav.about },
+  ];
+  const pathWithoutLocale = pathLocale ? `/${pathnameSegments.slice(1).join("/")}` : pathname;
+  const normalizedPath = pathWithoutLocale === "/" ? "" : pathWithoutLocale;
+
+  const withLocale = (href: string, locale = activeLocale) => {
+    if (href === "/") return `/${locale}`;
+    return `/${locale}${href}`;
+  };
+
+  const switchLocaleHref = (locale: AppLocale) =>
+    normalizedPath ? `/${locale}${normalizedPath}` : `/${locale}`;
 
   // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
   const shouldShowDesktopNavbar =
@@ -150,19 +173,22 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         >
           {/* Logo */}
           <Link
-            href="/"
+            href={withLocale("/")}
             className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
           </Link>
 
           {/* Desktop centre nav links */}
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Main navigation">
+          <nav
+            className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex"
+            aria-label={dictionary.nav.mainNavigation}
+          >
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
-                href={href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                href={withLocale(href)}
+                className="pointer-events-auto text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 {label}
               </Link>
@@ -170,19 +196,41 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           </nav>
 
           {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 md:gap-5">
             <Link
-              href="/contact"
+              href={withLocale("/contact")}
               className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
             >
-              Get in touch
+              {dictionary.nav.getInTouch}
             </Link>
+            <div className="hidden items-center text-xs tracking-wide text-muted-foreground md:flex">
+              {localeOptions.map(({ locale, label }, index) => {
+                const isActive = activeLocale === locale;
+                return (
+                  <span key={locale} className="flex items-center">
+                    <Link
+                      href={switchLocaleHref(locale)}
+                      className={`px-0.5 transition-all ${isActive
+                        ? "font-bold text-foreground"
+                        : "font-medium hover:text-foreground hover:opacity-85"
+                        }`}
+                      aria-current={isActive ? "page" : undefined}
+                    >
+                      {label}
+                    </Link>
+                    {index < localeOptions.length - 1 ? (
+                      <span className="px-1 text-muted-foreground/70">/</span>
+                    ) : null}
+                  </span>
+                );
+              })}
+            </div>
 
             {/* Hamburger — mobile only */}
             <button
               onClick={() => setMobileOpen((o) => !o)}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-label={mobileOpen ? dictionary.nav.closeMenu : dictionary.nav.openMenu}
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
             >
@@ -197,7 +245,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label={dictionary.nav.navigationMenu}
         className="fixed inset-0 z-40 flex flex-col bg-background md:hidden"
         style={{
           opacity: mobileOpen ? 1 : 0,
@@ -209,11 +257,11 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         <div className="h-[65px]" />
 
         {/* Nav links */}
-        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label="Mobile navigation">
+        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label={dictionary.nav.mobileNavigation}>
           {navLinks.map(({ href, label }, i) => (
             <Link
               key={href}
-              href={href}
+              href={withLocale(href)}
               onClick={() => setMobileOpen(false)}
               className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
               style={{
@@ -229,12 +277,34 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
         {/* Bottom CTA */}
         <div className="px-8 pb-12">
+          <div className="mb-4 flex items-center justify-center text-xs tracking-wide text-muted-foreground">
+            {localeOptions.map(({ locale, label }, index) => {
+              const isActive = activeLocale === locale;
+              return (
+                <span key={locale} className="flex items-center">
+                  <Link
+                    href={switchLocaleHref(locale)}
+                    onClick={() => setMobileOpen(false)}
+                    className={`px-0.5 transition-colors ${isActive
+                      ? "font-bold text-foreground"
+                      : "font-medium hover:text-foreground"
+                      }`}
+                  >
+                    {label}
+                  </Link>
+                  {index < localeOptions.length - 1 ? (
+                    <span className="px-1 text-muted-foreground/70">/</span>
+                  ) : null}
+                </span>
+              );
+            })}
+          </div>
           <Link
-            href="/contact"
+            href={withLocale("/contact")}
             onClick={() => setMobileOpen(false)}
             className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
           >
-            Get in touch
+            {dictionary.nav.getInTouch}
           </Link>
         </div>
       </div>
