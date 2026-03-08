@@ -28,16 +28,6 @@ export default async function Home({
     <main className="min-h-screen bg-background">
       <Navbar hideUntilScroll />
 
-      <section className="px-6 pt-24 md:pt-28">
-        <div className="mx-auto max-w-7xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{dictionary.localeName}</span>
-            <span aria-hidden>•</span>
-            <span>{dictionary.translationStatus}</span>
-          </div>
-        </div>
-      </section>
-
       {/* Hero Section with 3D Carousel */}
       <HeroCarousel />
 
