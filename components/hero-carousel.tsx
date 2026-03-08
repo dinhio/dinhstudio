@@ -17,6 +17,7 @@ interface CarouselItem {
     glow: string;
     ctaBackground: string;
     ctaBorder: string;
+    ctaShadow: string;
   };
 }
 
@@ -32,6 +33,7 @@ const carouselItems: CarouselItem[] = [
       glow: "0 0 24px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.75)",
       ctaBackground: "rgba(255,255,255,0.14)",
       ctaBorder: "rgba(255,255,255,0.38)",
+      ctaShadow: "0 8px 20px rgba(0,0,0,0.35)",
     },
   },
   {
@@ -45,6 +47,7 @@ const carouselItems: CarouselItem[] = [
       glow: "0 0 24px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)",
       ctaBackground: "rgba(255,255,255,0.12)",
       ctaBorder: "rgba(255,255,255,0.35)",
+      ctaShadow: "0 8px 20px rgba(0,0,0,0.35)",
     },
   },
   {
@@ -58,6 +61,7 @@ const carouselItems: CarouselItem[] = [
       glow: "0 0 22px rgba(0,0,0,0.82), 0 2px 8px rgba(0,0,0,0.72)",
       ctaBackground: "rgba(255,255,255,0.11)",
       ctaBorder: "rgba(255,255,255,0.33)",
+      ctaShadow: "0 8px 20px rgba(0,0,0,0.35)",
     },
   },
   {
@@ -71,6 +75,7 @@ const carouselItems: CarouselItem[] = [
       glow: "0 0 26px rgba(0,0,0,0.88), 0 2px 8px rgba(0,0,0,0.82)",
       ctaBackground: "rgba(255,255,255,0.13)",
       ctaBorder: "rgba(255,255,255,0.37)",
+      ctaShadow: "0 8px 20px rgba(0,0,0,0.35)",
     },
   },
   {
@@ -84,6 +89,7 @@ const carouselItems: CarouselItem[] = [
       glow: "0 0 24px rgba(0,0,0,0.86), 0 2px 8px rgba(0,0,0,0.78)",
       ctaBackground: "rgba(255,255,255,0.14)",
       ctaBorder: "rgba(255,255,255,0.4)",
+      ctaShadow: "0 8px 20px rgba(0,0,0,0.35)",
     },
   },
 ];
@@ -469,7 +475,7 @@ export function HeroCarousel() {
               backgroundColor: activeColor.ctaBackground,
               borderColor: activeColor.ctaBorder,
               color: activeColor.primary,
-              boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
+              boxShadow: activeColor.ctaShadow,
             }}
           >
             View Case
