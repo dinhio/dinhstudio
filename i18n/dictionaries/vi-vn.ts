@@ -176,12 +176,12 @@ export const viVN = {
       {
         question: "Một dự án thường mất bao lâu?",
         answer:
-          "Thời gian thực hiện phụ thuộc vào phạm vi và độ phức tạp. Gói Khởi động thường mất 6-10 tuần, còn gói Làm mới thường từ 4-8 tuần.",
+          "Thời gian thực hiện phụ thuộc vào phạm vi và độ phức tạp. Gói Khởi động thường mất 1-4 tuần, còn gói Làm mới thường từ 2-6 tuần.",
       },
       {
         question: "Bạn làm việc với những nền tảng nào?",
         answer:
-          "Chúng tôi chuyên về công nghệ web hiện đại như Next.js, React và các giải pháp CMS headless. Chúng tôi cũng có thể triển khai trên Shopify và WordPress.",
+          "Chúng tôi chuyên về công nghệ web hiện đại như Next.js, React và các giải pháp CMS headless. Chúng tôi cũng có thể triển khai trên Stripe và Shopify.",
       },
       {
         question: "Có hỗ trợ kế hoạch thanh toán không?",

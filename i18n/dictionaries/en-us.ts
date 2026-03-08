@@ -326,12 +326,12 @@ export const enUS: TranslationDictionary = {
       {
         question: "How long does a typical project take?",
         answer:
-          "Project timelines vary based on scope and complexity. A Kickstart project typically takes 6-10 weeks, while a Revamp can be completed in 4-8 weeks.",
+          "Project timelines vary based on scope and complexity. A Kickstart project typically takes 1-4 weeks, while a Revamp can be completed in 2-6 weeks.",
       },
       {
         question: "What platforms do you work with?",
         answer:
-          "We specialize in modern web technologies including Next.js, React, and headless CMS solutions. We can also work with platforms like Shopify and WordPress.",
+          "We specialize in modern web technologies including Next.js, React, and headless CMS solutions. We can also work with platforms like Stripe and Shopify.",
       },
       {
         question: "Do you offer payment plans?",
