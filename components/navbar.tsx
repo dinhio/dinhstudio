@@ -1,6 +1,8 @@
 "use client";
 
+import { isValidLocale, type AppLocale } from "@/i18n/config";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -15,12 +17,18 @@ const navLinks = [
   { href: "/about", label: "About" },
 ];
 
+const localeOptions: Array<{ locale: AppLocale; label: string }> = [
+  { locale: "en-us", label: "EN" },
+  { locale: "vi-vn", label: "VI" },
+];
+
 // Threshold for scroll reveal (viewport height)
 const SCROLL_THRESHOLD_VH = 0.85;
 // Mouse proximity zone at top of viewport (in pixels)
 const MOUSE_PROXIMITY_ZONE = 80;
 
 export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
+  const pathname = usePathname() ?? "/";
   const [bgOpacity, setBgOpacity] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   // Track if mouse is near top of viewport
@@ -29,6 +37,21 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   const [hasScrolledPast, setHasScrolledPast] = useState(false);
   // Ref to track hiding timeout
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const pathnameSegments = pathname.split("/").filter(Boolean);
+  const pathLocale = pathnameSegments[0]?.toLowerCase();
+  const activeLocale: AppLocale = isValidLocale(pathLocale) ? pathLocale : "en-us";
+  const pathWithoutLocale =
+    isValidLocale(pathLocale) ? `/${pathnameSegments.slice(1).join("/")}` : pathname;
+  const normalizedPath = pathWithoutLocale === "/" ? "" : pathWithoutLocale;
+
+  const withLocale = (href: string, locale = activeLocale) => {
+    if (href === "/") return `/${locale}`;
+    return `/${locale}${href}`;
+  };
+
+  const switchLocaleHref = (locale: AppLocale) =>
+    normalizedPath ? `/${locale}${normalizedPath}` : `/${locale}`;
 
   // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
   const shouldShowDesktopNavbar =
@@ -150,7 +173,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         >
           {/* Logo */}
           <Link
-            href="/"
+            href={withLocale("/")}
             className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
@@ -161,7 +184,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
-                href={href}
+                href={withLocale(href)}
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 {label}
@@ -171,8 +194,26 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
           {/* Right side — desktop: Get in touch | mobile: Get in touch + hamburger */}
           <div className="flex items-center gap-3">
+            <div className="hidden items-center rounded-full border border-border/80 bg-card/60 p-1 backdrop-blur md:flex">
+              {localeOptions.map(({ locale, label }) => {
+                const isActive = activeLocale === locale;
+                return (
+                  <Link
+                    key={locale}
+                    href={switchLocaleHref(locale)}
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition-colors ${isActive
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
             <Link
-              href="/contact"
+              href={withLocale("/contact")}
               className="flex h-9 items-center justify-center rounded-full bg-foreground px-4 text-sm font-medium text-background transition-all hover:bg-foreground/90 hover:scale-105"
             >
               Get in touch
@@ -213,7 +254,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           {navLinks.map(({ href, label }, i) => (
             <Link
               key={href}
-              href={href}
+              href={withLocale(href)}
               onClick={() => setMobileOpen(false)}
               className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
               style={{
@@ -229,8 +270,26 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
         {/* Bottom CTA */}
         <div className="px-8 pb-12">
+          <div className="mb-4 flex items-center justify-center gap-2">
+            {localeOptions.map(({ locale, label }) => {
+              const isActive = activeLocale === locale;
+              return (
+                <Link
+                  key={locale}
+                  href={switchLocaleHref(locale)}
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${isActive
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground"
+                    }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
           <Link
-            href="/contact"
+            href={withLocale("/contact")}
             onClick={() => setMobileOpen(false)}
             className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
           >
