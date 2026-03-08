@@ -1,6 +1,6 @@
 "use client";
 
-import { isValidLocale, type AppLocale } from "@/i18n/config";
+import { DEFAULT_LOCALE, parseLocale, type AppLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,16 +34,15 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const pathnameSegments = pathname.split("/").filter(Boolean);
-  const pathLocale = pathnameSegments[0]?.toLowerCase();
-  const activeLocale: AppLocale = isValidLocale(pathLocale) ? pathLocale : "en-us";
+  const pathLocale = parseLocale(pathnameSegments[0]);
+  const activeLocale: AppLocale = pathLocale ?? DEFAULT_LOCALE;
   const dictionary = getDictionary(activeLocale);
   const navLinks = [
     { href: "/work", label: dictionary.nav.work },
     { href: "/services", label: dictionary.nav.services },
     { href: "/about", label: dictionary.nav.about },
   ];
-  const pathWithoutLocale =
-    isValidLocale(pathLocale) ? `/${pathnameSegments.slice(1).join("/")}` : pathname;
+  const pathWithoutLocale = pathLocale ? `/${pathnameSegments.slice(1).join("/")}` : pathname;
   const normalizedPath = pathWithoutLocale === "/" ? "" : pathWithoutLocale;
 
   const withLocale = (href: string, locale = activeLocale) => {
