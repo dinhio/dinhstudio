@@ -152,12 +152,13 @@ export default async function AboutPage({
                 "React",
                 "TypeScript",
                 "Tailwind CSS",
-                "Framer Motion",
                 "Vercel",
                 "Figma",
-                "Sanity",
+                "Stripe",
                 "Shopify",
+                "Polar",
                 "Node.js",
+                "Framer Motion",
               ].map((tech) => (
                 <span
                   key={tech}
