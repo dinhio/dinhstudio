@@ -1,13 +1,14 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type HeroCarouselComponent = ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
 type HeroPhase = "loading" | "transition" | "ready";
 
 const HANDOFF_DURATION_MS = 700;
+const MIN_CENTER_HOLD_MS = 240;
 const HERO_HANDOFF_SEEN_KEY = "hero-handoff-seen-v3";
 
 let hasAnimatedInRuntime = false;
@@ -53,21 +54,17 @@ function shouldAnimateHandoff(pathname: string | null) {
   return true;
 }
 
-function getInitialAnimatePolicy() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return shouldAnimateHandoff(window.location.pathname);
-}
-
 function HeroFallback({
   isTransitioning,
   shouldAnimate,
+  policyResolved,
 }: {
   isTransitioning: boolean;
   shouldAnimate: boolean;
+  policyResolved: boolean;
 }) {
+  const shouldAnimateFromCenter = !policyResolved || shouldAnimate;
+
   return (
     <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
       <div
@@ -86,7 +83,7 @@ function HeroFallback({
 
       <h1
         className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-white transition-[top,transform,font-size] duration-700 ease-out md:block ${
-          shouldAnimate
+          shouldAnimateFromCenter
             ? isTransitioning
               ? "top-8 translate-y-0 text-2xl"
               : "top-1/2 -translate-y-1/2 text-7xl"
@@ -103,7 +100,15 @@ export function HeroExperience() {
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
   const [phase, setPhase] = useState<HeroPhase>("loading");
   const [carouselReady, setCarouselReady] = useState(false);
-  const [shouldAnimate] = useState(getInitialAnimatePolicy);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
+  const [policyResolved, setPolicyResolved] = useState(false);
+  const mountedAtRef = useRef<number>(0);
+
+  useEffect(() => {
+    mountedAtRef.current = performance.now();
+    setShouldAnimate(shouldAnimateHandoff(window.location.pathname));
+    setPolicyResolved(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,20 +132,27 @@ export function HeroExperience() {
   }, []);
 
   useEffect(() => {
-    if (!Carousel || !carouselReady) return;
+    if (!Carousel || !carouselReady || !policyResolved) return;
 
     if (!shouldAnimate) {
       setPhase("ready");
       return;
     }
 
-    setPhase("transition");
-    const timeoutId = window.setTimeout(() => {
+    const elapsed = performance.now() - mountedAtRef.current;
+    const delayBeforeTransition = Math.max(0, MIN_CENTER_HOLD_MS - elapsed);
+    const transitionTimer = window.setTimeout(() => {
+      setPhase("transition");
+    }, delayBeforeTransition);
+    const readyTimer = window.setTimeout(() => {
       setPhase("ready");
-    }, HANDOFF_DURATION_MS);
+    }, delayBeforeTransition + HANDOFF_DURATION_MS);
 
-    return () => window.clearTimeout(timeoutId);
-  }, [Carousel, carouselReady, shouldAnimate]);
+    return () => {
+      window.clearTimeout(transitionTimer);
+      window.clearTimeout(readyTimer);
+    };
+  }, [Carousel, carouselReady, policyResolved, shouldAnimate]);
 
   const showFallback = phase !== "ready";
   const showCarousel = phase === "transition" || phase === "ready";
@@ -165,6 +177,7 @@ export function HeroExperience() {
         <HeroFallback
           isTransitioning={phase === "transition"}
           shouldAnimate={shouldAnimate}
+          policyResolved={policyResolved}
         />
       ) : null}
     </section>
