@@ -20,9 +20,6 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
         }`}
       >
         <h1 className="text-5xl font-bold tracking-tight text-foreground">dinhstudio</h1>
-        <p className="mt-4 text-sm tracking-[0.14em] text-muted-foreground uppercase">
-          Design Better. Launch Faster.
-        </p>
       </div>
       <h1
         className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-foreground transition-[top,transform,font-size] duration-700 ease-out md:block ${
@@ -33,15 +30,6 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
       >
         dinhstudio
       </h1>
-      <p
-        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 text-base tracking-[0.14em] text-muted-foreground uppercase transition-all duration-700 ease-out md:block ${
-          isTransitioning
-            ? "top-[4.65rem] translate-y-0 opacity-0"
-            : "top-[calc(50%+3.5rem)] -translate-y-1/2 opacity-100"
-        }`}
-      >
-        Design Better. Launch Faster.
-      </p>
     </div>
   );
 }
