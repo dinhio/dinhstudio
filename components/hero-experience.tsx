@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean }>;
+type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
 const CAROUSEL_LOAD_DELAY_MS = 1200;
 
@@ -44,6 +44,7 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
 
 export function HeroExperience() {
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
+  const [carouselReady, setCarouselReady] = useState(false);
   const [showCarousel, setShowCarousel] = useState(false);
 
   useEffect(() => {
@@ -83,24 +84,31 @@ export function HeroExperience() {
   }, [Carousel]);
 
   useEffect(() => {
-    if (!Carousel) return;
+    if (!Carousel || !carouselReady) return;
 
-    const rafId = window.requestAnimationFrame(() => {
-      setShowCarousel(true);
+    let rafB = 0;
+    const rafA = window.requestAnimationFrame(() => {
+      rafB = window.requestAnimationFrame(() => {
+        setShowCarousel(true);
+      });
     });
 
-    return () => window.cancelAnimationFrame(rafId);
-  }, [Carousel]);
+    return () => {
+      window.cancelAnimationFrame(rafA);
+      if (rafB) window.cancelAnimationFrame(rafB);
+    };
+  }, [Carousel, carouselReady]);
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-background">
       {Carousel ? (
         <div
-          className={`absolute inset-0 z-10 transition-opacity duration-700 ${
+          className={`absolute inset-0 z-10 transition-opacity duration-700 will-change-opacity ${
             showCarousel ? "opacity-100" : "opacity-0"
           }`}
+          style={{ backfaceVisibility: "hidden", transform: "translateZ(0)" }}
         >
-          <Carousel showTopLogo={false} />
+          <Carousel showTopLogo={false} onReady={() => setCarouselReady(true)} />
         </div>
       ) : null}
       <HeroFallback isTransitioning={showCarousel} />

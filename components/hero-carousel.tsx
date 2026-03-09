@@ -189,7 +189,13 @@ function carouselReducer(state: CarouselState, action: CarouselAction): Carousel
   };
 }
 
-export function HeroCarousel({ showTopLogo = true }: { showTopLogo?: boolean } = {}) {
+export function HeroCarousel({
+  showTopLogo = true,
+  onReady,
+}: {
+  showTopLogo?: boolean;
+  onReady?: () => void;
+} = {}) {
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
   const [carouselState, dispatch] = useReducer(carouselReducer, {
@@ -198,6 +204,7 @@ export function HeroCarousel({ showTopLogo = true }: { showTopLogo?: boolean } =
     slotMap: buildSlotMap(2),
   });
   const { activeIndex, isAnimating, slotMap } = carouselState;
+  const hasSignaledReady = useRef(false);
 
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -235,6 +242,17 @@ export function HeroCarousel({ showTopLogo = true }: { showTopLogo?: boolean } =
     },
     [activeIndex, isAnimating]
   );
+
+  const signalReady = useCallback(() => {
+    if (hasSignaledReady.current) return;
+    hasSignaledReady.current = true;
+    onReady?.();
+  }, [onReady]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(signalReady, 900);
+    return () => window.clearTimeout(timeoutId);
+  }, [signalReady]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -448,6 +466,7 @@ export function HeroCarousel({ showTopLogo = true }: { showTopLogo?: boolean } =
                   sizes="(max-width: 768px) 100vw, 420px"
                   className="object-cover"
                   priority={isPriority}
+                  onLoad={isActive ? signalReady : undefined}
                   {...(!isPriority ? { loading: "lazy" as const } : {})}
                 />
                 {/* Bottom gradient so card edges don't bleed */}
