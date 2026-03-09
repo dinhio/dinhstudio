@@ -464,6 +464,7 @@ export function HeroCarousel({
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 420px"
+                  quality={65}
                   className="object-cover"
                   priority={isPriority}
                   onLoad={isActive ? signalReady : undefined}

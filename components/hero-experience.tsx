@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
@@ -9,20 +10,32 @@ const HANDOFF_DURATION_MS = 700;
 function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+      <Image
+        src="/carousel/project-3.jpg"
+        alt=""
+        aria-hidden
+        fill
+        priority
+        quality={65}
+        sizes="100vw"
+        className="object-cover"
+      />
+      <div className="absolute inset-0 bg-black/35" />
       <div
         className={`absolute inset-0 bg-background transition-opacity duration-700 ${
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
+        style={{ mixBlendMode: "multiply" }}
       />
       <div
         className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center transition-opacity duration-500 md:hidden ${
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       >
-        <h1 className="text-5xl font-bold tracking-tight text-foreground">dinhstudio</h1>
+        <h1 className="text-5xl font-bold tracking-tight text-white">dinhstudio</h1>
       </div>
       <h1
-        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-foreground transition-[top,transform,font-size] duration-700 ease-out md:block ${
+        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-white transition-[top,transform,font-size] duration-700 ease-out md:block ${
           isTransitioning
             ? "top-8 translate-y-0 text-2xl"
             : "top-1/2 -translate-y-1/2 text-7xl"
