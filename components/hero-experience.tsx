@@ -1,8 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type HeroCarouselComponent = ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
@@ -54,6 +53,14 @@ function shouldAnimateHandoff(pathname: string | null) {
   return true;
 }
 
+function getInitialAnimatePolicy() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return shouldAnimateHandoff(window.location.pathname);
+}
+
 function HeroFallback({
   isTransitioning,
   shouldAnimate,
@@ -93,17 +100,10 @@ function HeroFallback({
 }
 
 export function HeroExperience() {
-  const pathname = usePathname();
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
   const [phase, setPhase] = useState<HeroPhase>("loading");
   const [carouselReady, setCarouselReady] = useState(false);
-  const [shouldAnimate, setShouldAnimate] = useState(false);
-  const [policyResolved, setPolicyResolved] = useState(false);
-
-  useLayoutEffect(() => {
-    setShouldAnimate(shouldAnimateHandoff(pathname));
-    setPolicyResolved(true);
-  }, [pathname]);
+  const [shouldAnimate] = useState(getInitialAnimatePolicy);
 
   useEffect(() => {
     let cancelled = false;
@@ -127,7 +127,7 @@ export function HeroExperience() {
   }, []);
 
   useEffect(() => {
-    if (!Carousel || !carouselReady || !policyResolved) return;
+    if (!Carousel || !carouselReady) return;
 
     if (!shouldAnimate) {
       setPhase("ready");
@@ -140,7 +140,7 @@ export function HeroExperience() {
     }, HANDOFF_DURATION_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [Carousel, carouselReady, policyResolved, shouldAnimate]);
+  }, [Carousel, carouselReady, shouldAnimate]);
 
   const showFallback = phase !== "ready";
   const showCarousel = phase === "transition" || phase === "ready";
