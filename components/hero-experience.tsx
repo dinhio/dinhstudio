@@ -8,11 +8,12 @@ const CAROUSEL_LOAD_DELAY_MS = 1200;
 
 function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
   return (
-    <div
-      className={`absolute inset-0 z-20 overflow-hidden bg-background transition-opacity duration-700 ${
-        isTransitioning ? "pointer-events-none opacity-0" : "opacity-100"
-      }`}
-    >
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+      <div
+        className={`absolute inset-0 bg-background transition-opacity duration-700 ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+      />
       <div className="absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center md:hidden">
         <h1 className="text-5xl font-bold tracking-tight text-foreground">dinhstudio</h1>
         <p className="mt-4 text-sm tracking-[0.14em] text-muted-foreground uppercase">
@@ -20,10 +21,10 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
         </p>
       </div>
       <h1
-        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-foreground transition-all duration-700 ease-out md:block ${
+        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-foreground transition-[top,transform,font-size] duration-700 ease-out md:block ${
           isTransitioning
-            ? "top-8 translate-y-0 text-2xl opacity-0"
-            : "top-1/2 -translate-y-1/2 text-7xl opacity-100"
+            ? "top-8 translate-y-0 text-2xl"
+            : "top-1/2 -translate-y-1/2 text-7xl"
         }`}
       >
         dinhstudio
@@ -99,7 +100,7 @@ export function HeroExperience() {
             showCarousel ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Carousel showTopLogo />
+          <Carousel showTopLogo={false} />
         </div>
       ) : null}
       <HeroFallback isTransitioning={showCarousel} />
