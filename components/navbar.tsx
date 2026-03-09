@@ -50,6 +50,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
     if (href === "/") return `/${locale}`;
     return `/${locale}${href}`;
   };
+  const homeHref = withLocale("/");
 
   const switchLocaleHref = useCallback(
     (locale: AppLocale) => (normalizedPath ? `/${locale}${normalizedPath}` : `/${locale}`),
@@ -197,7 +198,16 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
         >
           {/* Logo */}
           <Link
-            href={withLocale("/")}
+            href={homeHref}
+            scroll
+            onClick={(event) => {
+              setMobileOpen(false);
+
+              if (pathname === homeHref) {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
             className="text-xl font-bold tracking-tight text-foreground transition-opacity hover:opacity-70 font-sans"
           >
             dinhstudio
