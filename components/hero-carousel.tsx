@@ -323,6 +323,13 @@ export function HeroCarousel() {
 
   // Keep upcoming slides warm for faster first interactions on slower networks.
   useEffect(() => {
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    if (connection?.saveData || connection?.effectiveType === "2g") {
+      return;
+    }
+
     const prefetchIndices = [
       (activeIndex + 1) % TOTAL,
       (activeIndex + 2) % TOTAL,
@@ -394,7 +401,7 @@ export function HeroCarousel() {
         {carouselItems.map((item, index) => {
           const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
-          const isPriority = isActive || slot === 1;
+          const isPriority = isActive;
           const visual = getSlotVisual(slot);
 
           return (

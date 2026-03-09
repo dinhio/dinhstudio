@@ -83,6 +83,19 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
   // Handle scroll behavior
   useEffect(() => {
+    if (alwaysVisible) {
+      if (!mobileOpen) return;
+
+      const closeOnScroll = () => {
+        if (window.scrollY > 10) {
+          setMobileOpen(false);
+        }
+      };
+
+      window.addEventListener("scroll", closeOnScroll, { passive: true });
+      return () => window.removeEventListener("scroll", closeOnScroll);
+    }
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const threshold = window.innerHeight * SCROLL_THRESHOLD_VH;
@@ -106,7 +119,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [alwaysVisible, hideUntilScroll, mobileOpen, isMouseNearTop]);
+  }, [alwaysVisible, hideUntilScroll, mobileOpen]);
 
   const backgroundOpacity =
     alwaysVisible
@@ -118,6 +131,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
   // Handle mouse move for proximity detection
   useEffect(() => {
     if (!hideUntilScroll || alwaysVisible) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => {

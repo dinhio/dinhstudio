@@ -1,7 +1,7 @@
-import { HeroCarousel } from "@/components/hero-carousel";
+import { HeroExperience } from "@/components/hero-experience";
 import { Navbar } from "@/components/navbar";
 import { parseLocale } from "@/i18n/config";
-import { getDictionary } from "@/i18n/dictionaries";
+import { getCachedDictionary } from "@/i18n/dictionaries/runtime-cache";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,7 +18,7 @@ export default async function Home({
     notFound();
   }
 
-  const dictionary = getDictionary(normalizedLocale);
+  const dictionary = await getCachedDictionary(normalizedLocale);
   const withLocale = (href: string) => {
     if (href === "/") return `/${normalizedLocale}`;
     return `/${normalizedLocale}${href}`;
@@ -28,8 +28,7 @@ export default async function Home({
     <main className="min-h-screen bg-background">
       <Navbar hideUntilScroll />
 
-      {/* Hero Section with 3D Carousel */}
-      <HeroCarousel />
+      <HeroExperience />
 
       {/* Content Section */}
       <section id="content" className="relative py-32 px-6">
