@@ -38,8 +38,19 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
 export function HeroExperience() {
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
   const [carouselReady, setCarouselReady] = useState(false);
+  const [enableHandoff, setEnableHandoff] = useState(true);
   const [showCarousel, setShowCarousel] = useState(false);
   const [showFallback, setShowFallback] = useState(true);
+
+  useEffect(() => {
+    const hasSeenHandoff = window.sessionStorage.getItem("hero-handoff-seen") === "1";
+    if (hasSeenHandoff) {
+      setEnableHandoff(false);
+      return;
+    }
+
+    window.sessionStorage.setItem("hero-handoff-seen", "1");
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,6 +76,12 @@ export function HeroExperience() {
   useEffect(() => {
     if (!Carousel || !carouselReady) return;
 
+    if (!enableHandoff) {
+      setShowCarousel(true);
+      setShowFallback(false);
+      return;
+    }
+
     const rafA = window.requestAnimationFrame(() => {
       setShowCarousel(true);
     });
@@ -72,11 +89,16 @@ export function HeroExperience() {
     return () => {
       window.cancelAnimationFrame(rafA);
     };
-  }, [Carousel, carouselReady]);
+  }, [Carousel, carouselReady, enableHandoff]);
 
   useEffect(() => {
     if (!showCarousel) {
       setShowFallback(true);
+      return;
+    }
+
+    if (!enableHandoff) {
+      setShowFallback(false);
       return;
     }
 
@@ -85,7 +107,7 @@ export function HeroExperience() {
     }, HANDOFF_DURATION_MS + 80);
 
     return () => window.clearTimeout(timeoutId);
-  }, [showCarousel]);
+  }, [showCarousel, enableHandoff]);
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-background">
@@ -102,7 +124,7 @@ export function HeroExperience() {
           />
         </div>
       ) : null}
-      {showFallback ? <HeroFallback isTransitioning={showCarousel} /> : null}
+      {showFallback ? <HeroFallback isTransitioning={enableHandoff && showCarousel} /> : null}
     </section>
   );
 }
