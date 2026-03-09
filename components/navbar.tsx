@@ -4,7 +4,7 @@ import { DEFAULT_LOCALE, parseLocale, type AppLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, type MouseEvent as ReactMouseEvent } from "react";
 import { Menu, X } from "lucide-react";
 
 interface NavbarProps {
@@ -26,6 +26,16 @@ const MOUSE_PROXIMITY_ZONE = 80;
 function normalizePath(path: string) {
   if (!path || path === "/") return "/";
   return path.endsWith("/") ? path.slice(0, -1) : path;
+}
+
+function isUnmodifiedPrimaryClick(event: ReactMouseEvent<HTMLAnchorElement>) {
+  return (
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
 }
 
 export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
@@ -69,11 +79,35 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
       if (locale === activeLocale) continue;
       router.prefetch(switchLocaleHref(locale));
     }
-
-    for (const suffix of prefetchRouteSuffixes) {
-      router.prefetch(`/${activeLocale}${suffix}`);
-    }
   }, [activeLocale, router, switchLocaleHref]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const prefetchAdditionalRoutes = () => {
+      for (const suffix of prefetchRouteSuffixes) {
+        router.prefetch(`/${activeLocale}${suffix}`);
+      }
+    };
+
+    const win = window as Window & {
+      requestIdleCallback?: (callback: () => void) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+
+    if (typeof win.requestIdleCallback === "function") {
+      const idleId = win.requestIdleCallback(prefetchAdditionalRoutes);
+
+      return () => {
+        if (typeof win.cancelIdleCallback === "function") {
+          win.cancelIdleCallback(idleId);
+        }
+      };
+    }
+
+    const timeoutId = win.setTimeout(prefetchAdditionalRoutes, 150);
+    return () => win.clearTimeout(timeoutId);
+  }, [mobileOpen, activeLocale, router]);
 
   useEffect(() => {
     if (!pendingMobilePath) return;
@@ -99,6 +133,18 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
       router.push(targetHref, { scroll: true });
     },
     [pathname, router]
+  );
+
+  const handleMobileLinkClick = useCallback(
+    (event: ReactMouseEvent<HTMLAnchorElement>, targetHref: string) => {
+      if (!isUnmodifiedPrimaryClick(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      handleMobileRouteSelect(targetHref);
+    },
+    [handleMobileRouteSelect]
   );
 
   // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
@@ -299,7 +345,10 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
 
             {/* Hamburger — mobile only */}
             <button
-              onClick={() => setMobileOpen((o) => !o)}
+              onClick={() => {
+                setPendingMobilePath(null);
+                setMobileOpen((o) => !o);
+              }}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
               aria-label={mobileOpen ? dictionary.nav.closeMenu : dictionary.nav.openMenu}
               aria-expanded={mobileOpen}
@@ -329,10 +378,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
               <Link
                 key={href}
                 href={withLocale(href)}
-                onClick={(event) => {
-                  event.preventDefault();
-                  handleMobileRouteSelect(withLocale(href));
-                }}
+                onClick={(event) => handleMobileLinkClick(event, withLocale(href))}
                 className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
                 style={{
                   opacity: 1,
@@ -354,10 +400,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
                   <span key={locale} className="flex items-center">
                     <Link
                       href={switchLocaleHref(locale)}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleMobileRouteSelect(switchLocaleHref(locale));
-                      }}
+                      onClick={(event) => handleMobileLinkClick(event, switchLocaleHref(locale))}
                       className={`px-0.5 transition-colors ${isActive
                         ? "font-bold text-foreground"
                         : "font-medium hover:text-foreground"
@@ -374,10 +417,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
             </div>
             <Link
               href={withLocale("/contact")}
-              onClick={(event) => {
-                event.preventDefault();
-                handleMobileRouteSelect(withLocale("/contact"));
-              }}
+              onClick={(event) => handleMobileLinkClick(event, withLocale("/contact"))}
               className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
             >
               {dictionary.nav.getInTouch}
