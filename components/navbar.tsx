@@ -3,7 +3,7 @@
 import { DEFAULT_LOCALE, parseLocale, type AppLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -24,6 +24,7 @@ const MOUSE_PROXIMITY_ZONE = 80;
 
 export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: NavbarProps) {
   const pathname = usePathname() ?? "/";
+  const router = useRouter();
   const [bgOpacity, setBgOpacity] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   // Track if mouse is near top of viewport
@@ -50,8 +51,17 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
     return `/${locale}${href}`;
   };
 
-  const switchLocaleHref = (locale: AppLocale) =>
-    normalizedPath ? `/${locale}${normalizedPath}` : `/${locale}`;
+  const switchLocaleHref = useCallback(
+    (locale: AppLocale) => (normalizedPath ? `/${locale}${normalizedPath}` : `/${locale}`),
+    [normalizedPath],
+  );
+
+  useEffect(() => {
+    for (const { locale } of localeOptions) {
+      if (locale === activeLocale) continue;
+      router.prefetch(switchLocaleHref(locale));
+    }
+  }, [activeLocale, router, switchLocaleHref]);
 
   // Desktop-only reveal on homepage: after hero scroll or top-edge mouse movement.
   const shouldShowDesktopNavbar =
