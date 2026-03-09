@@ -89,7 +89,10 @@ export function HeroExperience() {
           }`}
           style={{ backfaceVisibility: "hidden", transform: "translateZ(0)" }}
         >
-          <Carousel showTopLogo onReady={() => setCarouselReady(true)} />
+          <Carousel
+            showTopLogo={showCarousel && !showFallback}
+            onReady={() => setCarouselReady(true)}
+          />
         </div>
       ) : null}
       {showFallback ? <HeroFallback isTransitioning={showCarousel} /> : null}
