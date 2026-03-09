@@ -14,7 +14,11 @@ function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       />
-      <div className="absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center md:hidden">
+      <div
+        className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center transition-opacity duration-500 md:hidden ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+      >
         <h1 className="text-5xl font-bold tracking-tight text-foreground">dinhstudio</h1>
         <p className="mt-4 text-sm tracking-[0.14em] text-muted-foreground uppercase">
           Design Better. Launch Faster.
@@ -97,7 +101,7 @@ export function HeroExperience() {
           }`}
           style={{ backfaceVisibility: "hidden", transform: "translateZ(0)" }}
         >
-          <Carousel showTopLogo={false} onReady={() => setCarouselReady(true)} />
+          <Carousel showTopLogo onReady={() => setCarouselReady(true)} />
         </div>
       ) : null}
       {showFallback ? <HeroFallback isTransitioning={showCarousel} /> : null}
