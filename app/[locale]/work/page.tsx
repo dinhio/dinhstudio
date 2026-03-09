@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseLocale } from "@/i18n/config";
-import { getDictionary } from "@/i18n/dictionaries";
+import { getCachedDictionary } from "@/i18n/dictionaries/runtime-cache";
 
 export default async function WorkPage({
   params,
@@ -18,7 +18,7 @@ export default async function WorkPage({
     notFound();
   }
 
-  const dictionary = getDictionary(normalizedLocale);
+  const dictionary = await getCachedDictionary(normalizedLocale);
   const withLocale = (href: string) => {
     if (href === "/") return `/${normalizedLocale}`;
     return `/${normalizedLocale}${href}`;

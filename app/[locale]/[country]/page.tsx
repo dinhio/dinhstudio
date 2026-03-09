@@ -1,9 +1,18 @@
-import { getDictionary } from "@/i18n/dictionaries";
-import { parseLocale } from "@/i18n/config";
+import { parseLocale, SUPPORTED_LOCALES } from "@/i18n/config";
+import { getCachedDictionary } from "@/i18n/dictionaries/runtime-cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const SUPPORTED_COUNTRIES = new Set(["us", "vn"]);
+const COUNTRIES = ["us", "vn"] as const;
+const SUPPORTED_COUNTRIES = new Set<string>(COUNTRIES);
+
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return SUPPORTED_LOCALES.flatMap((locale) =>
+    COUNTRIES.map((country) => ({ locale, country })),
+  );
+}
 
 export default async function CountryPage({
   params,
@@ -22,7 +31,7 @@ export default async function CountryPage({
     notFound();
   }
 
-  const dictionary = getDictionary(normalizedLocale);
+  const dictionary = await getCachedDictionary(normalizedLocale);
 
   return (
     <main className="min-h-screen bg-background px-6 py-24">

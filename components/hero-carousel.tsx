@@ -189,7 +189,13 @@ function carouselReducer(state: CarouselState, action: CarouselAction): Carousel
   };
 }
 
-export function HeroCarousel() {
+export function HeroCarousel({
+  showTopLogo = true,
+  onReady,
+}: {
+  showTopLogo?: boolean;
+  onReady?: () => void;
+} = {}) {
   const [isDraggingCursor, setIsDraggingCursor] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
   const [carouselState, dispatch] = useReducer(carouselReducer, {
@@ -198,6 +204,7 @@ export function HeroCarousel() {
     slotMap: buildSlotMap(2),
   });
   const { activeIndex, isAnimating, slotMap } = carouselState;
+  const hasSignaledReady = useRef(false);
 
   // Swipe / drag tracking
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -235,6 +242,17 @@ export function HeroCarousel() {
     },
     [activeIndex, isAnimating]
   );
+
+  const signalReady = useCallback(() => {
+    if (hasSignaledReady.current) return;
+    hasSignaledReady.current = true;
+    onReady?.();
+  }, [onReady]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(signalReady, 250);
+    return () => window.clearTimeout(timeoutId);
+  }, [signalReady]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -323,6 +341,17 @@ export function HeroCarousel() {
 
   // Keep upcoming slides warm for faster first interactions on slower networks.
   useEffect(() => {
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    if (
+      connection?.saveData ||
+      connection?.effectiveType === "2g" ||
+      connection?.effectiveType === "slow-2g"
+    ) {
+      return;
+    }
+
     const prefetchIndices = [
       (activeIndex + 1) % TOTAL,
       (activeIndex + 2) % TOTAL,
@@ -359,11 +388,13 @@ export function HeroCarousel() {
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background">
       {/* Logo — hidden on mobile to avoid clash with the fixed nav top-bar */}
-      <div className="absolute top-8 left-1/2 z-50 -translate-x-1/2 hidden md:block">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground font-sans">
-          dinhstudio
-        </h1>
-      </div>
+      {showTopLogo ? (
+        <div className="absolute top-8 left-1/2 z-50 -translate-x-1/2 hidden md:block">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground font-sans">
+            dinhstudio
+          </h1>
+        </div>
+      ) : null}
 
       {/* Carousel track — drag / swipe area */}
       <div
@@ -394,7 +425,7 @@ export function HeroCarousel() {
         {carouselItems.map((item, index) => {
           const slot = (slotMap[index] ?? -2) as Slot;
           const isActive = slot === 0;
-          const isPriority = isActive || slot === 1;
+          const isPriority = isActive;
           const visual = getSlotVisual(slot);
 
           return (
@@ -428,15 +459,29 @@ export function HeroCarousel() {
                   transition: "width 550ms cubic-bezier(0.4,0,0.2,1), height 550ms cubic-bezier(0.4,0,0.2,1)",
                 }}
               >
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 420px"
-                  className="object-cover"
-                  priority={isPriority}
-                  {...(!isPriority ? { loading: "lazy" as const } : {})}
-                />
+                {isActive ? (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 420px"
+                    unoptimized
+                    priority
+                    className="object-cover"
+                    onLoad={signalReady}
+                  />
+                ) : (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 420px"
+                    quality={65}
+                    className="object-cover"
+                    priority={isPriority}
+                    {...(!isPriority ? { loading: "lazy" as const } : {})}
+                  />
+                )}
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               </div>

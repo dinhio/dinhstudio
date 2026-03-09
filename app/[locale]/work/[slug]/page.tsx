@@ -1,10 +1,22 @@
 import { Navbar } from "@/components/navbar";
-import { parseLocale } from "@/i18n/config";
-import { getDictionary } from "@/i18n/dictionaries";
+import { parseLocale, SUPPORTED_LOCALES } from "@/i18n/config";
+import { dictionaries } from "@/i18n/dictionaries";
+import { getCachedDictionary } from "@/i18n/dictionaries/runtime-cache";
 import { ArrowLeft, Quote } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+export const revalidate = 3600;
+
+export function generateStaticParams() {
+  return SUPPORTED_LOCALES.flatMap((locale) =>
+    dictionaries[locale].work.projects.map((project) => ({
+      locale,
+      slug: project.link.split("/").at(-1) ?? project.id,
+    })),
+  );
+}
 
 export default async function WorkProjectPage({
   params,
@@ -18,7 +30,7 @@ export default async function WorkProjectPage({
     notFound();
   }
 
-  const dictionary = getDictionary(normalizedLocale);
+  const dictionary = await getCachedDictionary(normalizedLocale);
   const project = dictionary.work.projects.find(
     (item) => item.id === slug || item.link.endsWith(`/${slug}`),
   );
