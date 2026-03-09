@@ -1,80 +1,78 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type HeroCarouselComponent = React.ComponentType;
+type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean }>;
 
 const CAROUSEL_LOAD_DELAY_MS = 1200;
 
-function HeroFallback() {
+function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
   return (
-    <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-background">
-      <Image
-        src="/carousel/project-3.jpg"
-        alt="Featured project"
-        fill
-        priority
-        quality={72}
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/25 to-background/75" />
-      <div className="relative z-10 px-6 text-center">
-        <p className="text-sm tracking-[0.22em] text-white/75 uppercase">Selected Work</p>
-        <h1 className="mt-5 text-5xl font-bold tracking-tight text-white md:text-7xl">
+    <div
+      className={`absolute inset-0 z-20 overflow-hidden bg-background transition-opacity duration-700 ${
+        isTransitioning ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
+    >
+      <div
+        className={`absolute left-1/2 z-30 px-6 text-center transition-all duration-700 ease-out ${
+          isTransitioning
+            ? "top-8 -translate-x-1/2 translate-y-0 opacity-0"
+            : "top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-100"
+        }`}
+      >
+        <h1 className="text-5xl font-bold tracking-tight text-foreground md:text-7xl">
           dinhstudio
         </h1>
-        <a
-          href="#content"
-          className="mt-10 inline-flex items-center text-sm font-medium tracking-wide text-white/90 transition-opacity hover:opacity-80"
-        >
-          Explore
-        </a>
+        <p className="mt-4 text-sm tracking-[0.14em] text-muted-foreground uppercase md:text-base">
+          Design Better. Launch Faster.
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
 
 export function HeroExperience() {
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
+  const [showCarousel, setShowCarousel] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    if (!mediaQuery.matches) return;
-
     let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let idleId: number | null = null;
-
-    const loadCarousel = () => {
+    const timeoutId = setTimeout(() => {
       void import("@/components/hero-carousel").then(({ HeroCarousel }) => {
         if (!cancelled) {
           setCarousel(() => HeroCarousel);
         }
       });
-    };
-
-    if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(loadCarousel, { timeout: CAROUSEL_LOAD_DELAY_MS });
-    } else {
-      timeoutId = setTimeout(loadCarousel, CAROUSEL_LOAD_DELAY_MS);
-    }
+    }, CAROUSEL_LOAD_DELAY_MS);
 
     return () => {
       cancelled = true;
-      if (idleId !== null && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
+      clearTimeout(timeoutId);
     };
   }, []);
 
-  if (Carousel) {
-    return <Carousel />;
-  }
+  useEffect(() => {
+    if (!Carousel) return;
 
-  return <HeroFallback />;
+    const rafId = window.requestAnimationFrame(() => {
+      setShowCarousel(true);
+    });
+
+    return () => window.cancelAnimationFrame(rafId);
+  }, [Carousel]);
+
+  return (
+    <section className="relative h-screen w-full overflow-hidden bg-background">
+      {Carousel ? (
+        <div
+          className={`absolute inset-0 z-10 transition-opacity duration-700 ${
+            showCarousel ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Carousel showTopLogo={false} />
+        </div>
+      ) : null}
+      <HeroFallback isTransitioning={showCarousel} />
+    </section>
+  );
 }
