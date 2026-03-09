@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
 const CAROUSEL_LOAD_DELAY_MS = 1200;
+const HANDOFF_DURATION_MS = 700;
 
 function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
   return (
@@ -46,6 +47,7 @@ export function HeroExperience() {
   const [Carousel, setCarousel] = useState<HeroCarouselComponent | null>(null);
   const [carouselReady, setCarouselReady] = useState(false);
   const [showCarousel, setShowCarousel] = useState(false);
+  const [showFallback, setShowFallback] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,6 +83,19 @@ export function HeroExperience() {
     };
   }, [Carousel, carouselReady]);
 
+  useEffect(() => {
+    if (!showCarousel) {
+      setShowFallback(true);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowFallback(false);
+    }, HANDOFF_DURATION_MS + 80);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showCarousel]);
+
   return (
     <section className="relative h-screen w-full overflow-hidden bg-background">
       {Carousel ? (
@@ -93,7 +108,7 @@ export function HeroExperience() {
           <Carousel showTopLogo={false} onReady={() => setCarouselReady(true)} />
         </div>
       ) : null}
-      <HeroFallback isTransitioning={showCarousel} />
+      {showFallback ? <HeroFallback isTransitioning={showCarousel} /> : null}
     </section>
   );
 }

@@ -17,7 +17,9 @@ export function proxy(request: NextRequest) {
   const pathnameLocale = getLocaleFromPathname(pathname);
 
   if (pathnameLocale) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.cookies.set(LOCALE_COOKIE_NAME, pathnameLocale, { path: "/" });
+    return response;
   }
 
   const locale = resolveLocale({
@@ -37,5 +39,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/((?!_next|api|en-us|vi-vn|.*\\..*).*)"],
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
 };
