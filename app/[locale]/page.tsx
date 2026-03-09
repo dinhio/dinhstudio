@@ -31,7 +31,7 @@ export default async function Home({
       <HeroExperience />
 
       {/* Content Section */}
-      <section id="content" className="relative py-32 px-6">
+      <section id="content" className="defer-render relative py-32 px-6">
         <div className="mx-auto max-w-7xl">
           {/* Intro Section */}
           <div className="mb-32 grid gap-16 md:grid-cols-2">

@@ -255,73 +255,71 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
       </header>
 
       {/* ── Mobile full-screen overlay menu ──────────────────────────────── */}
-      <div
-        id="mobile-menu"
-        role="dialog"
-        aria-modal="true"
-        aria-label={dictionary.nav.navigationMenu}
-        className="fixed inset-0 z-[79] flex flex-col bg-background md:hidden"
-        style={{
-          opacity: mobileOpen ? 1 : 0,
-          pointerEvents: mobileOpen ? "auto" : "none",
-          transition: "opacity 300ms ease",
-        }}
-      >
-        {/* Spacer so links sit below the header bar */}
-        <div className="h-[65px]" />
+      {mobileOpen ? (
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label={dictionary.nav.navigationMenu}
+          className="fixed inset-0 z-[79] flex flex-col bg-background md:hidden"
+          style={{ transition: "opacity 300ms ease" }}
+        >
+          {/* Spacer so links sit below the header bar */}
+          <div className="h-[65px]" />
 
-        {/* Nav links */}
-        <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label={dictionary.nav.mobileNavigation}>
-          {navLinks.map(({ href, label }, i) => (
+          {/* Nav links */}
+          <nav className="flex flex-1 flex-col items-start justify-center gap-8 px-8" aria-label={dictionary.nav.mobileNavigation}>
+            {navLinks.map(({ href, label }, i) => (
+              <Link
+                key={href}
+                href={withLocale(href)}
+                onClick={() => setMobileOpen(false)}
+                className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
+                style={{
+                  opacity: 1,
+                  transform: "translateY(0)",
+                  transition: `transform 350ms ease ${i * 60 + 50}ms, opacity 350ms ease ${i * 60 + 50}ms, color 200ms ease`,
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Bottom CTA */}
+          <div className="px-8 pb-12">
+            <div className="mb-4 flex items-center justify-center text-xs tracking-wide text-muted-foreground">
+              {localeOptions.map(({ locale, label }, index) => {
+                const isActive = activeLocale === locale;
+                return (
+                  <span key={locale} className="flex items-center">
+                    <Link
+                      href={switchLocaleHref(locale)}
+                      onClick={() => setMobileOpen(false)}
+                      className={`px-0.5 transition-colors ${isActive
+                        ? "font-bold text-foreground"
+                        : "font-medium hover:text-foreground"
+                        }`}
+                    >
+                      {label}
+                    </Link>
+                    {index < localeOptions.length - 1 ? (
+                      <span className="px-1 text-muted-foreground/70">/</span>
+                    ) : null}
+                  </span>
+                );
+              })}
+            </div>
             <Link
-              key={href}
-              href={withLocale(href)}
+              href={withLocale("/contact")}
               onClick={() => setMobileOpen(false)}
-              className="text-4xl font-bold text-foreground transition-colors hover:text-muted-foreground"
-              style={{
-                opacity: mobileOpen ? 1 : 0,
-                transform: mobileOpen ? "translateY(0)" : "translateY(12px)",
-                transition: `transform 350ms ease ${i * 60 + 50}ms, opacity 350ms ease ${i * 60 + 50}ms, color 200ms ease`,
-              }}
+              className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
             >
-              {label}
+              {dictionary.nav.getInTouch}
             </Link>
-          ))}
-        </nav>
-
-        {/* Bottom CTA */}
-        <div className="px-8 pb-12">
-          <div className="mb-4 flex items-center justify-center text-xs tracking-wide text-muted-foreground">
-            {localeOptions.map(({ locale, label }, index) => {
-              const isActive = activeLocale === locale;
-              return (
-                <span key={locale} className="flex items-center">
-                  <Link
-                    href={switchLocaleHref(locale)}
-                    onClick={() => setMobileOpen(false)}
-                    className={`px-0.5 transition-colors ${isActive
-                      ? "font-bold text-foreground"
-                      : "font-medium hover:text-foreground"
-                      }`}
-                  >
-                    {label}
-                  </Link>
-                  {index < localeOptions.length - 1 ? (
-                    <span className="px-1 text-muted-foreground/70">/</span>
-                  ) : null}
-                </span>
-              );
-            })}
           </div>
-          <Link
-            href={withLocale("/contact")}
-            onClick={() => setMobileOpen(false)}
-            className="flex h-14 w-full items-center justify-center rounded-full bg-foreground text-base font-medium text-background transition-all hover:bg-foreground/90"
-          >
-            {dictionary.nav.getInTouch}
-          </Link>
         </div>
-      </div>
+      ) : null}
     </>
   );
 }

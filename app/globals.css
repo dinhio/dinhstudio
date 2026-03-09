@@ -78,3 +78,9 @@ html {
 .text-balance {
   text-wrap: balance;
 }
+
+/* Defer rendering work for below-the-fold content */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: 1200px;
+}
