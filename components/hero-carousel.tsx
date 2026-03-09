@@ -250,7 +250,7 @@ export function HeroCarousel({
   }, [onReady]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(signalReady, 900);
+    const timeoutId = window.setTimeout(signalReady, 250);
     return () => window.clearTimeout(timeoutId);
   }, [signalReady]);
 

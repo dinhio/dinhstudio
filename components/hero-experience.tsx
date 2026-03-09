@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
-const CAROUSEL_LOAD_DELAY_MS = 1200;
 const HANDOFF_DURATION_MS = 700;
 
 function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
@@ -53,33 +52,26 @@ export function HeroExperience() {
     let cancelled = false;
     if (Carousel) return;
 
-    const timeoutId = setTimeout(() => {
-      void import("@/components/hero-carousel").then(({ HeroCarousel }) => {
-        if (!cancelled) {
-          setCarousel(() => HeroCarousel);
-        }
-      });
-    }, CAROUSEL_LOAD_DELAY_MS);
+    void import("@/components/hero-carousel").then(({ HeroCarousel }) => {
+      if (!cancelled) {
+        setCarousel(() => HeroCarousel);
+      }
+    });
 
     return () => {
       cancelled = true;
-      clearTimeout(timeoutId);
     };
   }, [Carousel]);
 
   useEffect(() => {
     if (!Carousel || !carouselReady) return;
 
-    let rafB = 0;
     const rafA = window.requestAnimationFrame(() => {
-      rafB = window.requestAnimationFrame(() => {
-        setShowCarousel(true);
-      });
+      setShowCarousel(true);
     });
 
     return () => {
       window.cancelAnimationFrame(rafA);
-      if (rafB) window.cancelAnimationFrame(rafB);
     };
   }, [Carousel, carouselReady]);
 
