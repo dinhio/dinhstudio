@@ -1,8 +1,9 @@
 "use client";
 
+import type { ComponentType } from "react";
 import { useEffect, useState } from "react";
 
-type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
+type HeroCarouselComponent = ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
 
 const HANDOFF_DURATION_MS = 700;
 

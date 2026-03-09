@@ -256,7 +256,7 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
               className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-foreground/10 md:hidden"
               aria-label={mobileOpen ? dictionary.nav.closeMenu : dictionary.nav.openMenu}
               aria-expanded={mobileOpen}
-              aria-controls="mobile-menu"
+              aria-controls={mobileOpen ? "mobile-menu" : undefined}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -272,7 +272,6 @@ export function Navbar({ alwaysVisible = false, hideUntilScroll = false }: Navba
           aria-modal="true"
           aria-label={dictionary.nav.navigationMenu}
           className="fixed inset-0 z-[79] flex flex-col bg-background md:hidden"
-          style={{ transition: "opacity 300ms ease" }}
         >
           {/* Spacer so links sit below the header bar */}
           <div className="h-[65px]" />
