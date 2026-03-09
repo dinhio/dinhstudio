@@ -48,38 +48,20 @@ export function HeroExperience() {
   const [showCarousel, setShowCarousel] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)");
-    if (!mediaQuery.matches) return;
-
     let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    if (Carousel) return;
 
-    const loadCarousel = () => {
-      if (Carousel) return;
-      timeoutId = setTimeout(() => {
-        void import("@/components/hero-carousel").then(({ HeroCarousel }) => {
-          if (!cancelled) {
-            setCarousel(() => HeroCarousel);
-          }
-        });
-      }, CAROUSEL_LOAD_DELAY_MS);
-    };
-
-    const onMediaChange = () => {
-      if (mediaQuery.matches) {
-        loadCarousel();
-      }
-    };
-
-    loadCarousel();
-    mediaQuery.addEventListener("change", onMediaChange);
+    const timeoutId = setTimeout(() => {
+      void import("@/components/hero-carousel").then(({ HeroCarousel }) => {
+        if (!cancelled) {
+          setCarousel(() => HeroCarousel);
+        }
+      });
+    }, CAROUSEL_LOAD_DELAY_MS);
 
     return () => {
       cancelled = true;
-      mediaQuery.removeEventListener("change", onMediaChange);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+      clearTimeout(timeoutId);
     };
   }, [Carousel]);
 
