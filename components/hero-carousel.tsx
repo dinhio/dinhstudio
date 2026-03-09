@@ -459,17 +459,29 @@ export function HeroCarousel({
                   transition: "width 550ms cubic-bezier(0.4,0,0.2,1), height 550ms cubic-bezier(0.4,0,0.2,1)",
                 }}
               >
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 420px"
-                  quality={65}
-                  className="object-cover"
-                  priority={isPriority}
-                  onLoad={isActive ? signalReady : undefined}
-                  {...(!isPriority ? { loading: "lazy" as const } : {})}
-                />
+                {isActive ? (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 420px"
+                    unoptimized
+                    priority
+                    className="object-cover"
+                    onLoad={signalReady}
+                  />
+                ) : (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 420px"
+                    quality={65}
+                    className="object-cover"
+                    priority={isPriority}
+                    {...(!isPriority ? { loading: "lazy" as const } : {})}
+                  />
+                )}
                 {/* Bottom gradient so card edges don't bleed */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type HeroCarouselComponent = React.ComponentType<{ showTopLogo?: boolean; onReady?: () => void }>;
@@ -10,22 +9,10 @@ const HANDOFF_DURATION_MS = 700;
 function HeroFallback({ isTransitioning }: { isTransitioning: boolean }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
-      <Image
-        src="/carousel/project-3.jpg"
-        alt=""
-        aria-hidden
-        fill
-        priority
-        quality={65}
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-black/35" />
       <div
         className={`absolute inset-0 bg-background transition-opacity duration-700 ${
           isTransitioning ? "opacity-0" : "opacity-100"
         }`}
-        style={{ mixBlendMode: "multiply" }}
       />
       <div
         className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center transition-opacity duration-500 md:hidden ${
@@ -67,6 +54,12 @@ export function HeroExperience() {
       cancelled = true;
     };
   }, [Carousel]);
+
+  useEffect(() => {
+    const preloaded = new window.Image();
+    preloaded.decoding = "async";
+    preloaded.src = "/carousel/project-3.jpg";
+  }, []);
 
   useEffect(() => {
     if (!Carousel || !carouselReady) return;
