@@ -63,35 +63,37 @@ function HeroFallback({
   shouldAnimate: boolean;
   policyResolved: boolean;
 }) {
-  const shouldAnimateFromCenter = !policyResolved || shouldAnimate;
+  const showLogoFallback = policyResolved && shouldAnimate;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
       <div
         className={`absolute inset-0 bg-background transition-opacity duration-700 ${
-          isTransitioning ? "opacity-0" : "opacity-100"
+          showLogoFallback && isTransitioning ? "opacity-0" : "opacity-100"
         }`}
       />
 
-      <div
-        className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center transition-opacity duration-500 md:hidden ${
-          isTransitioning ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        <h1 className="text-5xl font-bold tracking-tight text-white">dinhstudio</h1>
-      </div>
+      {showLogoFallback ? (
+        <>
+          <div
+            className={`absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2 px-6 text-center transition-opacity duration-500 md:hidden ${
+              isTransitioning ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            <h1 className="text-5xl font-bold tracking-tight text-white">dinhstudio</h1>
+          </div>
 
-      <h1
-        className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-white transition-[top,transform,font-size] duration-700 ease-out md:block ${
-          shouldAnimateFromCenter
-            ? isTransitioning
-              ? "top-8 translate-y-0 text-2xl"
-              : "top-1/2 -translate-y-1/2 text-7xl"
-            : "top-8 translate-y-0 text-2xl"
-        }`}
-      >
-        dinhstudio
-      </h1>
+          <h1
+            className={`absolute left-1/2 z-30 hidden -translate-x-1/2 font-bold tracking-tight text-white transition-[top,transform,font-size] duration-700 ease-out md:block ${
+              isTransitioning
+                ? "top-8 translate-y-0 text-2xl"
+                : "top-1/2 -translate-y-1/2 text-7xl"
+            }`}
+          >
+            dinhstudio
+          </h1>
+        </>
+      ) : null}
     </div>
   );
 }
