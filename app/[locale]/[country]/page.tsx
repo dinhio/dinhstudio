@@ -3,14 +3,14 @@ import { getCachedDictionary } from "@/i18n/dictionaries/runtime-cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const SUPPORTED_COUNTRIES = new Set(["us", "vn"]);
-const COUNTRY_PARAMS = ["us", "vn"] as const;
+const COUNTRIES = ["us", "vn"] as const;
+const SUPPORTED_COUNTRIES = new Set<string>(COUNTRIES);
 
 export const revalidate = 3600;
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.flatMap((locale) =>
-    COUNTRY_PARAMS.map((country) => ({ locale, country })),
+    COUNTRIES.map((country) => ({ locale, country })),
   );
 }
 

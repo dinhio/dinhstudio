@@ -326,7 +326,11 @@ export function HeroCarousel({ showTopLogo = true }: { showTopLogo?: boolean } =
     const connection = (navigator as Navigator & {
       connection?: { saveData?: boolean; effectiveType?: string };
     }).connection;
-    if (connection?.saveData || connection?.effectiveType === "2g") {
+    if (
+      connection?.saveData ||
+      connection?.effectiveType === "2g" ||
+      connection?.effectiveType === "slow-2g"
+    ) {
       return;
     }
 
